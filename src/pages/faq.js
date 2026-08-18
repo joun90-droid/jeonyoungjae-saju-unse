@@ -1,4 +1,5 @@
 import { crumbs, infoBox, pageTemplate, relatedGuides } from './layout.js'
+import { SITE } from './site.js'
 
 export const meta = {
   path: '/faq',
@@ -45,7 +46,7 @@ export function render() {
       <h3>맞춤 광고를 끄고 싶어요.</h3>
       <p><a href="https://adssettings.google.com/" target="_blank" rel="noopener noreferrer">Google 광고 설정</a>에서 맞춤 광고를 비활성화할 수 있습니다. 브라우저에서 쿠키를 차단할 수도 있습니다.</p>
       <h3>오류를 발견했어요.</h3>
-      <p><a href="/contact">문의 페이지</a> 또는 <a href="mailto:jeonyoungjae.dev@gmail.com">jeonyoungjae.dev@gmail.com</a>으로 입력값(개인 식별이 안 되는 선에서)과 화면 설명을 보내 주세요. 개별 사주 상담은 받지 않습니다.</p>
+      <p><a href="/contact">문의 페이지</a> 또는 <a href="mailto:${SITE.email}">${SITE.email}</a>으로 입력값(개인 식별이 안 되는 선에서)과 화면 설명을 보내 주세요. 개별 사주 상담은 받지 않습니다.</p>
 
       <h3>대운과 세운의 차이는요?</h3>
       <p>대운은 대략 10년 단위의 기후, 세운은 그해의 날씨입니다. 본 사이트의 시기별 탭은 대운 흐름을 중심으로 과거·현재·미래를 보여 줍니다. 한 해 유행 운세와 숫자가 달라도 오류가 아닐 수 있습니다. 큰 결정은 대운 결을 먼저 보고, 그해의 충합은 일정·이동의 참고로 쓰세요.</p>

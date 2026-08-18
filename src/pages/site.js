@@ -1,7 +1,7 @@
 export const SITE = {
   name: '영재 사주운',
   operator: '전영재',
-  email: 'jeonyoungjae.dev@gmail.com',
+  email: 'joun90@gmail.com',
   origin: 'https://jeonyoungjae-saju-unse.web.app',
   effectiveDate: '2026년 8월 18일',
 }
