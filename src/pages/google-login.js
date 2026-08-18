@@ -9,7 +9,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
 } from 'firebase/auth'
-import { authErrorMessage, getCurrentUser, saveProfile, signOut } from '../lib/auth.js'
+import { authErrorMessage, continueWithoutLogin, getCurrentUser, saveProfile, signOut } from '../lib/auth.js'
 import { getFirebaseAuth } from '../lib/firebase.js'
 
 const EMAIL_KEY = 'saju-saved-email'
@@ -92,6 +92,8 @@ export function render() {
             : '처음이신가요? <button type="button" data-toggle-mode>회원가입</button>'}
         </p>
         <p class="login-status" data-login-status hidden></p>
+        <div class="divider"><span>또는</span></div>
+        <button type="button" class="continue-without-login" data-guest-continue>로그인 없이 계속 사용하기</button>
         <div class="login-legal">
           <a href="/privacy-policy">개인정보</a>
           <a href="/terms-of-service">약관</a>
@@ -207,6 +209,10 @@ export function bindLoginButtons(root) {
       const { signInWithNaver } = await import('./naver-login.js')
       await signInWithNaver()
     }, 'Naver')
+  })
+
+  root.querySelector('[data-guest-continue]')?.addEventListener('click', () => {
+    continueWithoutLogin()
   })
 }
 

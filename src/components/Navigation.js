@@ -10,10 +10,13 @@ function escapeHtml(str) {
 export function authBarHtml(user = getCurrentUser()) {
   const status = getSubscriptionStatus()
   if (!user) {
+    const guest = (() => {
+      try { return localStorage.getItem('isLoggedIn') === 'false' } catch { return false }
+    })()
     return `
       <div class="auth-inner">
-        <a class="auth-btn auth-google" href="/login">Google 로그인</a>
-        <a class="auth-btn auth-kakao" href="/login">Kakao 로그인</a>
+        ${guest ? '<span class="auth-badge auth-guest">게스트로 이용 중</span>' : ''}
+        <a class="auth-btn auth-up" href="/login">로그인</a>
       </div>`
   }
   const premium = status !== 'free'

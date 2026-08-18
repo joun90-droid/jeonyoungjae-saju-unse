@@ -736,6 +736,24 @@ textarea { resize: vertical; min-height: 120px; line-height: 1.5; }
   font-weight: 800;
   color: var(--good);
 }
+.auth-guest { color: var(--muted); }
+
+.guest-notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(196, 165, 253, 0.35);
+  background: rgba(124, 58, 237, 0.12);
+  font-size: 0.85rem;
+  color: var(--text);
+}
+.guest-notice[hidden] { display: none !important; }
+.guest-notice p { margin: 0; }
 .auth-menu { position: relative; }
 .auth-menu summary {
   list-style: none;

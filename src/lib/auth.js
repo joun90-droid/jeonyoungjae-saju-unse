@@ -4,6 +4,8 @@ import { refreshSubscriptionFromServer } from '../services/subscription.js'
 
 const USER_KEY = 'saju-auth-user'
 const TOKEN_KEY = 'saju-auth-token'
+const LOGIN_FLAG = 'isLoggedIn'
+const GUEST_NOTICE = 'saju-guest-notice'
 
 const listeners = new Set()
 
@@ -21,6 +23,7 @@ function cacheUser(user) {
     provider: user.providerData?.[0]?.providerId || 'firebase',
   }
   localStorage.setItem(USER_KEY, JSON.stringify(profile))
+  localStorage.setItem(LOGIN_FLAG, 'true')
   return profile
 }
 
@@ -37,6 +40,32 @@ export function getCurrentUser() {
   const live = getFirebaseAuth().currentUser
   if (live) return cacheUser(live)
   return getCachedUser()
+}
+
+export function isLoggedIn() {
+  if (getFirebaseAuth().currentUser) return true
+  try {
+    if (localStorage.getItem(LOGIN_FLAG) === 'true') return true
+    return Boolean(getCachedUser())
+  } catch {
+    return false
+  }
+}
+
+export function continueWithoutLogin() {
+  localStorage.setItem(LOGIN_FLAG, 'false')
+  localStorage.setItem(GUEST_NOTICE, '1')
+  location.assign('/')
+}
+
+export function consumeGuestNotice() {
+  try {
+    if (localStorage.getItem(GUEST_NOTICE) !== '1') return false
+    localStorage.removeItem(GUEST_NOTICE)
+    return true
+  } catch {
+    return false
+  }
 }
 
 export async function getIdToken() {
@@ -88,6 +117,7 @@ export async function initAuth() {
 export async function signOut() {
   await firebaseSignOut(getFirebaseAuth())
   cacheUser(null)
+  try { localStorage.setItem(LOGIN_FLAG, 'false') } catch { /* ignore */ }
   emit(null)
 }
 

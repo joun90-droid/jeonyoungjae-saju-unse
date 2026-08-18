@@ -236,6 +236,41 @@ body.is-login .legal-nav {
 .login-legal a { color: var(--login-muted); text-decoration: none; }
 .login-legal a:hover { color: #c4a5fd; }
 
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 30px 0 16px;
+  color: #94a3b8;
+  font-size: 14px;
+}
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #334155;
+}
+.divider span { padding: 0 15px; }
+
+.continue-without-login {
+  width: 100%;
+  min-height: 48px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.continue-without-login:hover {
+  transform: scale(1.02);
+  box-shadow: 0 20px 60px rgba(124, 58, 237, 0.3);
+}
+.continue-without-login:active { transform: scale(0.98); }
+
 .login-spinner {
   display: inline-block;
   width: 16px;
@@ -262,6 +297,7 @@ body.is-login .legal-nav {
   .login-brand { font-size: 24px; }
   .login-sub { font-size: 14px; }
   .login-btn { height: 48px; font-size: 14px; padding: 12px; }
+  .continue-without-login { font-size: 14px; min-height: 48px; }
 }
 
 @media (min-width: 641px) and (max-width: 1024px) {

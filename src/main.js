@@ -2,7 +2,7 @@ import { computeChart } from './engine/calculator.js'
 import { startRouter } from './router.js'
 import { saveBirth, loadBirth } from './lib/store.js'
 import { maybeNotifyToday } from './lib/notify.js'
-import { initAuth } from './lib/auth.js'
+import { consumeGuestNotice, initAuth } from './lib/auth.js'
 import { mountAuthBar } from './components/Navigation.js'
 
 import { analyzeOverall } from './engine/fortune.js'
@@ -38,6 +38,18 @@ function init() {
   mountAuthBar()
   startRouter()
   maybeNotifyToday()
+  const notice = document.getElementById('guestNotice')
+  if (notice) {
+    let guest = false
+    try { guest = localStorage.getItem('isLoggedIn') === 'false' } catch { /* ignore */ }
+    if (consumeGuestNotice() || (guest && !sessionStorage.getItem('saju-guest-seen'))) {
+      notice.hidden = false
+      sessionStorage.setItem('saju-guest-seen', '1')
+      notice.querySelector('[data-dismiss-guest]')?.addEventListener('click', () => {
+        notice.hidden = true
+      })
+    }
+  }
 
   const form = document.getElementById('birthForm')
 

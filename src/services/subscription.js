@@ -112,7 +112,42 @@ export async function refreshSubscriptionFromServer() {
   return getSubscriptionStatus()
 }
 
+export function showLoginPaywall(message = '상세 해석은 로그인 후 이용 가능합니다.') {
+  let el = document.getElementById('paywall')
+  if (!el) {
+    el = document.createElement('div')
+    el.id = 'paywall'
+    el.className = 'paywall'
+    document.body.appendChild(el)
+  }
+  el.hidden = false
+  el.innerHTML = `
+    <div class="paywall-card card">
+      <p class="eyebrow">Login</p>
+      <h2>로그인이 필요합니다</h2>
+      <p class="page-lead">${message}</p>
+      <div class="guess-actions">
+        <a class="btn-secondary" href="/login">로그인하러 가기</a>
+        <button type="button" class="btn-ghost" data-paywall-close>닫기</button>
+      </div>
+    </div>`
+  el.querySelector('[data-paywall-close]')?.addEventListener('click', () => {
+    el.hidden = true
+  })
+  el.addEventListener('click', (e) => {
+    if (e.target === el) el.hidden = true
+  })
+  return false
+}
+
 export function showPaywall(message = '상세 분석은 프리미엄이 필요합니다.') {
+  let loggedIn = false
+  try {
+    loggedIn = localStorage.getItem('isLoggedIn') === 'true' || Boolean(localStorage.getItem('saju-auth-user'))
+  } catch { /* ignore */ }
+  if (!loggedIn) {
+    return showLoginPaywall('상세 해석은 로그인 후 이용 가능합니다.')
+  }
   let el = document.getElementById('paywall')
   if (!el) {
     el = document.createElement('div')
@@ -152,6 +187,14 @@ export function handlePaywall(featureName = '상세 운세 해석') {
 }
 
 export function requirePremium(message) {
+  let loggedIn = false
+  try {
+    loggedIn = localStorage.getItem('isLoggedIn') === 'true' || Boolean(localStorage.getItem('saju-auth-user'))
+  } catch { /* ignore */ }
+  if (!loggedIn) {
+    showLoginPaywall(message || '상세 해석은 로그인 후 이용 가능합니다.')
+    return false
+  }
   if (isPremium()) return true
   showPaywall(message)
   return false
