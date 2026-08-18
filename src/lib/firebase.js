@@ -24,4 +24,5 @@ export function getFirebaseAuth() {
 
 export const SITE_ORIGIN = 'https://jeonyoungjae-saju-unse.web.app'
 export const KAKAO_REST_API_KEY = env.VITE_KAKAO_REST_API_KEY || ''
+export const NAVER_CLIENT_ID = env.VITE_NAVER_CLIENT_ID || ''
 export const TOSS_CLIENT_KEY = env.VITE_TOSS_CLIENT_KEY || ''

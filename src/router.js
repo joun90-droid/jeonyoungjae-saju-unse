@@ -10,6 +10,7 @@ import { meta as guideMeta, render as renderGuide } from './pages/guide-index.js
 import { bind as bindKakaoCb, meta as kakaoMeta, render as renderKakaoCb } from './pages/kakao-login.js'
 import { crumbs, pageTemplate } from './pages/layout.js'
 import { bind as bindMbti, meta as mbtiMeta, render as renderMbti } from './pages/mbti.js'
+import { bind as bindNaverCb, meta as naverMeta, render as renderNaverCb } from './pages/naver-login.js'
 import { meta as failMeta, render as renderFail } from './pages/payment-fail.js'
 import { bind as bindPayOk, meta as payOkMeta, render as renderPayOk } from './pages/payment-success.js'
 import { bind as bindPremium, meta as premiumMeta, render as renderPremium } from './pages/premium.js'
@@ -50,7 +51,9 @@ const ROUTES = {
   '/premium': { type: 'page', ...premiumMeta, render: renderPremium, bind: bindPremium },
   '/pricing': { type: 'page', ...pricingMeta, render: renderPricing, bind: bindPricing },
   '/login': { type: 'page', ...loginMeta, render: renderLogin, bind: bindGoogleLogin },
+  '/signup': { type: 'page', ...loginMeta, title: '회원가입 | 영재 사주운', render: renderLogin, bind: bindGoogleLogin },
   '/auth/kakao/callback': { type: 'page', ...kakaoMeta, render: renderKakaoCb, bind: bindKakaoCb },
+  '/auth/naver/callback': { type: 'page', ...naverMeta, render: renderNaverCb, bind: bindNaverCb },
   '/payment-success': { type: 'page', ...payOkMeta, render: renderPayOk, bind: bindPayOk },
   '/payment-fail': { type: 'page', ...failMeta, render: renderFail },
 }
@@ -124,7 +127,7 @@ function navMatch(path) {
   if (path === '/terms' || path === '/terms-of-service') return '/terms-of-service'
   if (path === '/about' || path === '/about-us') return '/about-us'
   if (path === '/contact') return '/contact'
-  if (path === '/premium' || path === '/pricing' || path === '/login' || path === '/payment-success' || path === '/payment-fail') {
+  if (path === '/premium' || path === '/pricing' || path === '/login' || path === '/signup' || path === '/payment-success' || path === '/payment-fail') {
     return '/pricing'
   }
   return '/guide'
@@ -144,6 +147,7 @@ function renderRoute() {
   if (!homeView || !pageView) return
 
   const path = normalizePath(location.pathname)
+  document.body.classList.toggle('is-login', path === '/login' || path === '/signup')
   const route = ROUTES[path]
   const isHome = !route || route.type === 'home'
 

@@ -12,6 +12,8 @@ initializeApp()
 const TOSS_SECRET_KEY = defineSecret('TOSS_SECRET_KEY')
 const KAKAO_REST_API_KEY = defineSecret('KAKAO_REST_API_KEY')
 const KAKAO_CLIENT_SECRET = defineSecret('KAKAO_CLIENT_SECRET')
+const NAVER_CLIENT_ID = defineSecret('NAVER_CLIENT_ID')
+const NAVER_CLIENT_SECRET = defineSecret('NAVER_CLIENT_SECRET')
 
 const MONTHLY = 4900
 const LIFETIME = 29900
@@ -102,53 +104,90 @@ app.get('/api/subscription', async (req, res) => {
 
 app.post('/api/social-auth', async (req, res) => {
   const { provider, code, redirectUri } = req.body || {}
-  if (provider !== 'kakao' || !code || !redirectUri) {
+  if ((provider !== 'kakao' && provider !== 'naver') || !code || !redirectUri) {
     return res.status(400).json({ error: '잘못된 요청입니다.' })
   }
   try {
-    const clientId = secretValue(KAKAO_REST_API_KEY)
-    if (!clientId) return res.status(500).json({ error: '카카오 로그인이 아직 설정되지 않았습니다.' })
-    const clientSecret = secretValue(KAKAO_CLIENT_SECRET)
-    const params = new URLSearchParams({
-      grant_type: 'authorization_code',
-      client_id: clientId,
-      redirect_uri: redirectUri,
-      code,
-    })
-    if (clientSecret) params.set('client_secret', clientSecret)
+    let uid
+    let displayName
+    let email
+    let photoURL
 
-    const tokenRes = await fetch('https://kauth.kakao.com/oauth/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: params,
-    })
-    const tokenJson = await tokenRes.json()
-    if (!tokenRes.ok) {
-      logger.error('Kakao 토큰 교환 실패', tokenJson)
-      return res.status(401).json({ error: '카카오 인증에 실패했습니다. Redirect URI를 Kakao Developers에 등록했는지 확인해 주세요.' })
+    if (provider === 'kakao') {
+      const clientId = secretValue(KAKAO_REST_API_KEY)
+      if (!clientId) return res.status(500).json({ error: '카카오 로그인이 아직 설정되지 않았습니다.' })
+      const clientSecret = secretValue(KAKAO_CLIENT_SECRET)
+      const params = new URLSearchParams({
+        grant_type: 'authorization_code',
+        client_id: clientId,
+        redirect_uri: redirectUri,
+        code,
+      })
+      if (clientSecret) params.set('client_secret', clientSecret)
+
+      const tokenRes = await fetch('https://kauth.kakao.com/oauth/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params,
+      })
+      const tokenJson = await tokenRes.json()
+      if (!tokenRes.ok) {
+        logger.error('Kakao 토큰 교환 실패', tokenJson)
+        return res.status(401).json({ error: '카카오 인증에 실패했습니다. Redirect URI를 Kakao Developers에 등록했는지 확인해 주세요.' })
+      }
+
+      const meRes = await fetch('https://kapi.kakao.com/v2/user/me', {
+        headers: { Authorization: `Bearer ${tokenJson.access_token}` },
+      })
+      const me = await meRes.json()
+      if (!meRes.ok || !me.id) {
+        return res.status(401).json({ error: '카카오 사용자 정보를 가져오지 못했습니다.' })
+      }
+      uid = `kakao:${me.id}`
+      displayName = me.kakao_account?.profile?.nickname || undefined
+      email = me.kakao_account?.email || undefined
+      photoURL = me.kakao_account?.profile?.profile_image_url || undefined
+    } else {
+      const clientId = secretValue(NAVER_CLIENT_ID)
+      const clientSecret = secretValue(NAVER_CLIENT_SECRET)
+      if (!clientId || !clientSecret) {
+        return res.status(500).json({ error: '네이버 로그인이 아직 설정되지 않았습니다.' })
+      }
+      const params = new URLSearchParams({
+        grant_type: 'authorization_code',
+        client_id: clientId,
+        client_secret: clientSecret,
+        redirect_uri: redirectUri,
+        code,
+      })
+      const tokenRes = await fetch(`https://nid.naver.com/oauth2.0/token?${params}`)
+      const tokenJson = await tokenRes.json()
+      if (!tokenRes.ok || tokenJson.error || !tokenJson.access_token) {
+        logger.error('Naver 토큰 교환 실패', tokenJson)
+        return res.status(401).json({ error: '네이버 인증에 실패했습니다. Callback URL을 Naver Developers에 등록했는지 확인해 주세요.' })
+      }
+      const meRes = await fetch('https://openapi.naver.com/v1/nid/me', {
+        headers: { Authorization: `Bearer ${tokenJson.access_token}` },
+      })
+      const me = await meRes.json()
+      if (me.resultcode !== '00' || !me.response?.id) {
+        return res.status(401).json({ error: '네이버 사용자 정보를 가져오지 못했습니다.' })
+      }
+      uid = `naver:${me.response.id}`
+      displayName = me.response.name || me.response.nickname || undefined
+      email = me.response.email || undefined
+      photoURL = me.response.profile_image || undefined
     }
 
-    const meRes = await fetch('https://kapi.kakao.com/v2/user/me', {
-      headers: { Authorization: `Bearer ${tokenJson.access_token}` },
-    })
-    const me = await meRes.json()
-    if (!meRes.ok || !me.id) {
-      return res.status(401).json({ error: '카카오 사용자 정보를 가져오지 못했습니다.' })
-    }
-
-    const uid = `kakao:${me.id}`
-    const displayName = me.kakao_account?.profile?.nickname || undefined
-    const email = me.kakao_account?.email || undefined
-    const photoURL = me.kakao_account?.profile?.profile_image_url || undefined
     await upsertAuthUser(uid, { displayName, email, photoURL })
     await getFirestore().collection('saju_users').doc(uid).set({
       email: email || '',
       name: displayName || '',
       photoURL: photoURL || '',
-      provider: 'kakao',
+      provider,
       updatedAt: FieldValue.serverTimestamp(),
     }, { merge: true })
-    const customToken = await getAuth().createCustomToken(uid, { provider: 'kakao' })
+    const customToken = await getAuth().createCustomToken(uid, { provider })
     res.json({ customToken })
   } catch (err) {
     logger.error('social-auth 오류', err)
@@ -225,7 +264,7 @@ app.use((req, res) => res.status(404).json({ error: 'not found' }))
 exports.sajuApi = onRequest(
   {
     region: 'asia-northeast3',
-    secrets: [TOSS_SECRET_KEY, KAKAO_REST_API_KEY, KAKAO_CLIENT_SECRET],
+    secrets: [TOSS_SECRET_KEY, KAKAO_REST_API_KEY, KAKAO_CLIENT_SECRET, NAVER_CLIENT_ID, NAVER_CLIENT_SECRET],
   },
   app,
 )
