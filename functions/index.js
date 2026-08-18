@@ -122,10 +122,23 @@ app.get('/api/subscription', async (req, res) => {
   })
 })
 
+function isSajuRedirect(redirectUri) {
+  try {
+    const url = new URL(redirectUri)
+    if (!ALLOWED.includes(url.origin)) return false
+    return url.pathname === '/auth/kakao/callback' || url.pathname === '/auth/naver/callback'
+  } catch {
+    return false
+  }
+}
+
 app.post('/api/social-auth', async (req, res) => {
   const { provider, code, redirectUri } = req.body || {}
   if ((provider !== 'kakao' && provider !== 'naver') || !code || !redirectUri) {
     return res.status(400).json({ error: '잘못된 요청입니다.' })
+  }
+  if (!isSajuRedirect(redirectUri)) {
+    return res.status(403).json({ error: '이 앱에서 허용하지 않는 로그인 경로입니다.' })
   }
   try {
     let uid
@@ -163,7 +176,7 @@ app.post('/api/social-auth', async (req, res) => {
       if (!meRes.ok || !me.id) {
         return res.status(401).json({ error: '카카오 사용자 정보를 가져오지 못했습니다.' })
       }
-      uid = `kakao:${me.id}`
+      uid = `saju:kakao:${me.id}`
       displayName = me.kakao_account?.profile?.nickname || undefined
       email = me.kakao_account?.email || undefined
       photoURL = me.kakao_account?.profile?.profile_image_url || undefined
@@ -193,7 +206,7 @@ app.post('/api/social-auth', async (req, res) => {
       if (me.resultcode !== '00' || !me.response?.id) {
         return res.status(401).json({ error: '네이버 사용자 정보를 가져오지 못했습니다.' })
       }
-      uid = `naver:${me.response.id}`
+      uid = `saju:naver:${me.response.id}`
       displayName = me.response.name || me.response.nickname || undefined
       email = me.response.email || undefined
       photoURL = me.response.profile_image || undefined
@@ -207,7 +220,7 @@ app.post('/api/social-auth', async (req, res) => {
       provider,
       updatedAt: FieldValue.serverTimestamp(),
     }, { merge: true })
-    const customToken = await getAuth().createCustomToken(uid, { provider })
+    const customToken = await getAuth().createCustomToken(uid, { provider, app: 'saju-unse' })
     res.json({ customToken })
   } catch (err) {
     logger.error('social-auth 오류', err)
