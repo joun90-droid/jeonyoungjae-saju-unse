@@ -55,7 +55,7 @@ export function isLoggedIn() {
 export function continueWithoutLogin() {
   localStorage.setItem(LOGIN_FLAG, 'false')
   localStorage.setItem(GUEST_NOTICE, '1')
-  location.assign('/')
+  if (location.pathname !== '/' || location.search) location.assign('/')
 }
 
 export function consumeGuestNotice() {

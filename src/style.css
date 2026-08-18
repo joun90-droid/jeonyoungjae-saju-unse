@@ -719,8 +719,10 @@ textarea { resize: vertical; min-height: 120px; line-height: 1.5; }
   justify-content: center;
   min-height: 44px;
   padding: 8px 14px;
+  border: 0;
   border-radius: 10px;
   text-decoration: none;
+  font: inherit;
   font-size: 0.78rem;
   font-weight: 800;
   cursor: pointer;

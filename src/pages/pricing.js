@@ -1,12 +1,13 @@
 import { getCurrentUser } from '../lib/auth.js'
 import { getSubscriptionStatus, statusLabel } from '../services/subscription.js'
 import { crumbs, pageTemplate } from './layout.js'
-import { handleLifetimePayment, handleMonthlyPayment, loginUrlForPlan } from './subscribe-monthly.js'
+import { handleLifetimePayment, handleMonthlyPayment } from './subscribe-monthly.js'
+import { openLogin } from './google-login.js'
 
 export const meta = {
   path: '/pricing',
   title: '프리미엄 | 영재 사주운',
-  description: '영재 사주운 프리미엄. 월간 ₩4,900 · 평생 ₩29,900. Google/Kakao 로그인 후 Toss로 결제합니다.',
+  description: '영재 사주운 프리미엄. 월간 ₩4,900 · 평생 ₩29,900. 로그인 후 Toss로 결제합니다.',
 }
 
 export function render() {
@@ -47,7 +48,7 @@ export function render() {
           <button type="button" class="btn-primary" data-pay="monthly" ${monthlyOn || lifeOn ? 'disabled' : ''}>
             ${monthlyOn ? '구독 중' : '월간 구독하기'}
           </button>
-          <p class="privacy">Google / Kakao 로그인 필수</p>
+          <p class="privacy">로그인 후 Toss로 결제</p>
         </article>
         <article class="price-card">
           <p class="eyebrow">PREMIUM LIFETIME</p>
@@ -61,7 +62,7 @@ export function render() {
           <button type="button" class="btn-secondary btn-block" data-pay="lifetime" ${lifeOn ? 'disabled' : ''}>
             ${lifeOn ? '구독 중 ✓' : '평생 구독하기'}
           </button>
-          <p class="privacy">Google / Kakao 로그인 필수</p>
+          <p class="privacy">로그인 후 Toss로 결제</p>
         </article>
       </div>
       <p class="login-status is-error" data-pay-status hidden></p>
@@ -89,7 +90,7 @@ export function bind(root) {
     btn.addEventListener('click', async () => {
       const plan = btn.dataset.pay
       if (!getCurrentUser()) {
-        location.assign(loginUrlForPlan(plan))
+        openLogin({ next: `/pricing?pay=${plan}` })
         return
       }
       show('')

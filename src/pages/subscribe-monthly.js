@@ -1,6 +1,7 @@
 import { getCurrentUser } from '../lib/auth.js'
 import { TOSS_CLIENT_KEY } from '../lib/firebase.js'
 import { SITE } from './site.js'
+import { openLogin } from './google-login.js'
 
 export const MONTHLY_AMOUNT = 4900
 export const LIFETIME_AMOUNT = 29900
@@ -11,13 +12,13 @@ export function generateOrderId(uid, plan) {
 }
 
 export function loginUrlForPlan(plan) {
-  return `/login?next=${encodeURIComponent(`/pricing?pay=${plan}`)}`
+  return `/?pay=${encodeURIComponent(plan)}`
 }
 
 async function startTossPay({ amount, orderName, plan }) {
   const user = getCurrentUser()
   if (!user) {
-    location.assign(loginUrlForPlan(plan))
+    openLogin({ next: `/pricing?pay=${plan}` })
     return
   }
   if (!TOSS_CLIENT_KEY) {

@@ -127,7 +127,7 @@ export function showLoginPaywall(message = '상세 해석은 로그인 후 이�
       <h2>로그인이 필요합니다</h2>
       <p class="page-lead">${message}</p>
       <div class="guess-actions">
-        <a class="btn-secondary" href="/login">로그인하러 가기</a>
+        <button type="button" class="btn-secondary" data-open-login>로그인하러 가기</button>
         <button type="button" class="btn-ghost" data-paywall-close>닫기</button>
       </div>
     </div>`
