@@ -6,6 +6,7 @@ import {
   sendPasswordResetEmail,
   setPersistence,
   signInWithEmailAndPassword,
+  updateProfile,
 } from 'firebase/auth'
 import { authErrorMessage, continueWithoutLogin, getCurrentUser, saveProfile, signOut } from '../lib/auth.js'
 import { getFirebaseAuth } from '../lib/firebase.js'
@@ -63,12 +64,19 @@ export function render() {
         <p class="login-sub">${signup ? '이메일로 회원가입' : '이메일로 로그인'}</p>
         <div class="login-divider"></div>
         <form class="login-form" data-email-form>
+          ${signup ? `
+          <label class="login-label" for="loginName">이름(닉네임)</label>
+          <input class="login-input" id="loginName" name="name" type="text" autocomplete="nickname" maxlength="40" placeholder="화면에 보일 이름">` : ''}
           <label class="login-label" for="loginEmail">📧 이메일 주소</label>
           <input class="login-input" id="loginEmail" name="email" type="email" autocomplete="email" required placeholder="you@example.com" value="${escapeAttr(email)}">
           <label class="login-label" for="loginPassword">비밀번호</label>
           <input class="login-input" id="loginPassword" name="password" type="password" autocomplete="${signup ? 'new-password' : 'current-password'}" minlength="6" placeholder="6자 이상">
+          ${signup ? `
+          <label class="login-label" for="loginPassword2">비밀번호 확인</label>
+          <input class="login-input" id="loginPassword2" name="password2" type="password" autocomplete="new-password" minlength="6" placeholder="비밀번호를 다시 입력">` : ''}
           <button type="submit" class="login-btn login-btn-email" data-email-submit>${signup ? '회원가입' : '이메일로 로그인'}</button>
         </form>
+        <p class="login-save-hint">가입하면 이메일과 이름이 서버에 저장됩니다. 비밀번호는 암호화되어 보관되며 사이트에 그대로 남지 않습니다.</p>
         <div class="login-checks">
           <label><input type="checkbox" data-remember checked> 자동 로그인 유지</label>
           <label><input type="checkbox" data-save-email ${email ? 'checked' : ''}> 정보 저장</label>
@@ -162,15 +170,30 @@ export function bindLoginButtons(root) {
     e.preventDefault()
     const email = root.querySelector('#loginEmail')?.value?.trim()
     const password = root.querySelector('#loginPassword')?.value || ''
+    const name = root.querySelector('#loginName')?.value?.trim() || ''
+    const password2 = root.querySelector('#loginPassword2')?.value || ''
     if (!email || !password) {
       setStatus('이메일과 비밀번호를 입력해 주세요.', 'error')
+      return
+    }
+    if (signupMode && password.length < 6) {
+      setStatus('비밀번호는 6자 이상이어야 합니다.', 'error')
+      return
+    }
+    if (signupMode && password !== password2) {
+      setStatus('비밀번호 확인이 같지 않습니다.', 'error')
       return
     }
     busy(submitBtn, true)
     try {
       await applySessionOptions(root)
-      if (signupMode) await createUserWithEmailAndPassword(getFirebaseAuth(), email, password)
-      else await signInWithEmailAndPassword(getFirebaseAuth(), email, password)
+      const auth = getFirebaseAuth()
+      if (signupMode) {
+        const cred = await createUserWithEmailAndPassword(auth, email, password)
+        if (name) await updateProfile(cred.user, { displayName: name })
+      } else {
+        await signInWithEmailAndPassword(auth, email, password)
+      }
       await done()
     } catch (err) {
       setStatus(authErrorMessage(err), 'error')

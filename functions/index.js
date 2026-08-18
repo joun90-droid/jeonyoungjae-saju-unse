@@ -73,18 +73,38 @@ const app = express()
 app.use(cors({ origin: ALLOWED, credentials: true }))
 app.use(express.json())
 
+app.get('/api/profile', async (req, res) => {
+  const decoded = await requireUser(req, res)
+  if (!decoded) return
+  const snap = await getFirestore().collection('saju_users').doc(decoded.uid).get()
+  const data = snap.exists ? snap.data() : {}
+  res.json({
+    uid: decoded.uid,
+    email: data.email || decoded.email || '',
+    name: data.name || decoded.name || '',
+    provider: data.provider || '',
+    createdAt: data.createdAt || null,
+    lastLoginAt: data.lastLoginAt || null,
+  })
+})
+
 app.post('/api/profile', async (req, res) => {
   const decoded = await requireUser(req, res)
   if (!decoded) return
   const { email, name, photoURL, provider } = req.body || {}
-  await getFirestore().collection('saju_users').doc(decoded.uid).set({
-    email: email || decoded.email || '',
-    name: name || decoded.name || '',
-    photoURL: photoURL || '',
-    provider: provider || '',
+  const ref = getFirestore().collection('saju_users').doc(decoded.uid)
+  const prev = await ref.get()
+  const payload = {
+    email: String(email || decoded.email || '').slice(0, 200),
+    name: String(name || decoded.name || '').slice(0, 80),
+    photoURL: String(photoURL || '').slice(0, 500),
+    provider: String(provider || 'password').slice(0, 40),
+    lastLoginAt: FieldValue.serverTimestamp(),
     updatedAt: FieldValue.serverTimestamp(),
-  }, { merge: true })
-  res.json({ ok: true })
+  }
+  if (!prev.exists) payload.createdAt = FieldValue.serverTimestamp()
+  await ref.set(payload, { merge: true })
+  res.json({ ok: true, uid: decoded.uid })
 })
 
 app.get('/api/subscription', async (req, res) => {

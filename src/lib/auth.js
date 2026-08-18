@@ -172,14 +172,10 @@ export async function getJson(path) {
 
 export async function saveProfile(user = getFirebaseAuth().currentUser) {
   if (!user) return
-  try {
-    await postJson('/api/profile', {
-      email: user.email || '',
-      name: user.displayName || '',
-      photoURL: user.photoURL || '',
-      provider: user.providerData?.[0]?.providerId || 'firebase',
-    }, { auth: true })
-  } catch {
-    /* 함수 미배포 시에도 로그인은 유지 */
-  }
+  await postJson('/api/profile', {
+    email: user.email || '',
+    name: user.displayName || user.email || '',
+    photoURL: user.photoURL || '',
+    provider: user.providerData?.[0]?.providerId || 'password',
+  }, { auth: true })
 }

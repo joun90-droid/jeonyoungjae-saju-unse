@@ -179,6 +179,12 @@ body.is-login .legal-nav {
   color: #fff;
   margin-top: 8px;
 }
+.login-save-hint {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--login-muted);
+}
 
 .login-checks {
   display: flex;
