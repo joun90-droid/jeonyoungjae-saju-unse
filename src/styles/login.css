@@ -8,9 +8,6 @@
   --login-muted: #94a3b8;
   --login-placeholder: #64748b;
   --login-border: #334155;
-  --login-google: #2563eb;
-  --login-kakao: #fee500;
-  --login-naver: #03c75a;
   box-sizing: border-box;
   min-height: calc(100dvh - 220px);
   display: flex;
@@ -120,13 +117,6 @@ body.is-login .legal-nav {
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
 }
 
-.login-social {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 8px;
-}
-
 .login-btn {
   width: 100%;
   height: 56px;
@@ -151,18 +141,7 @@ body.is-login .legal-nav {
 .login-btn-email {
   background: linear-gradient(135deg, #7c3aed, #ec4899);
   color: #fff;
-}
-.login-btn-google {
-  background: #2563eb;
-  color: #fff;
-}
-.login-btn-kakao {
-  background: #fee500;
-  color: #191919;
-}
-.login-btn-naver {
-  background: #03c75a;
-  color: #fff;
+  margin-top: 8px;
 }
 
 .login-checks {
@@ -282,11 +261,6 @@ body.is-login .legal-nav {
   animation: login-spin 3s linear infinite;
   vertical-align: -2px;
 }
-.login-btn-kakao .login-spinner {
-  border-color: rgba(0,0,0,0.2);
-  border-top-color: #191919;
-}
-
 @keyframes login-spin {
   to { transform: rotate(360deg); }
 }

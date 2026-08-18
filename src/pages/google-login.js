@@ -6,8 +6,6 @@ import {
   sendPasswordResetEmail,
   setPersistence,
   signInWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup,
 } from 'firebase/auth'
 import { authErrorMessage, continueWithoutLogin, getCurrentUser, saveProfile, signOut } from '../lib/auth.js'
 import { getFirebaseAuth } from '../lib/firebase.js'
@@ -16,16 +14,10 @@ import { SITE } from './site.js'
 const EMAIL_KEY = 'saju-saved-email'
 const REMEMBER_KEY = 'saju-remember-login'
 
-export async function signInWithGoogle() {
-  const cred = await signInWithPopup(getFirebaseAuth(), new GoogleAuthProvider())
-  await saveProfile(cred.user)
-  return cred.user
-}
-
 export const meta = {
   path: '/login',
   title: '로그인 | 영재 사주운',
-  description: 'Google, Kakao, Naver 또는 이메일로 영재 사주운에 로그인합니다.',
+  description: '이메일로 영재 사주운에 로그인합니다. 기본 사주 분석은 로그인 없이 이용할 수 있습니다.',
 }
 
 export function loginNext() {
@@ -73,11 +65,6 @@ export function render() {
           <input class="login-input" id="loginPassword" name="password" type="password" autocomplete="current-password" minlength="6" placeholder="6자 이상">
           <button type="submit" class="login-btn login-btn-email" data-email-submit>${signup ? '회원가입' : '이메일로 로그인'}</button>
         </form>
-        <div class="login-social">
-          <button type="button" class="login-btn login-btn-google" data-google-login>🔐 Google로 로그인</button>
-          <button type="button" class="login-btn login-btn-kakao" data-kakao-login>🎨 Kakao로 로그인</button>
-          <button type="button" class="login-btn login-btn-naver" data-naver-login>🔗 Naver로 로그인</button>
-        </div>
         <div class="login-checks">
           <label><input type="checkbox" data-remember checked> 자동 로그인 유지</label>
           <label><input type="checkbox" data-save-email ${email ? 'checked' : ''}> 정보 저장</label>
@@ -94,7 +81,7 @@ export function render() {
         </p>
         <p class="login-status" data-login-status hidden></p>
         <div class="divider"><span>또는</span></div>
-        <button type="button" class="continue-without-login" data-guest-continue>로그인 없이 계속 사용하기</button>
+        <button type="button" class="continue-without-login" data-guest-continue>홈으로 가서 바로 보기</button>
         <div class="login-legal">
           <a href="/privacy-policy">개인정보</a>
           <a href="/terms-of-service">약관</a>
@@ -182,35 +169,6 @@ export function bindLoginButtons(root) {
       setStatus(authErrorMessage(err), 'error')
       busy(submitBtn, false)
     }
-  })
-
-  const social = async (btn, fn, label) => {
-    setStatus(`${label} 창을 여는 중…`)
-    busy(btn, true)
-    try {
-      await applySessionOptions(root)
-      await fn()
-      await done()
-    } catch (err) {
-      setStatus(authErrorMessage(err), 'error')
-      busy(btn, false)
-    }
-  }
-
-  root.querySelector('[data-google-login]')?.addEventListener('click', () => {
-    social(root.querySelector('[data-google-login]'), signInWithGoogle, 'Google')
-  })
-  root.querySelector('[data-kakao-login]')?.addEventListener('click', () => {
-    social(root.querySelector('[data-kakao-login]'), async () => {
-      const { signInWithKakao } = await import('./kakao-login.js')
-      await signInWithKakao()
-    }, 'Kakao')
-  })
-  root.querySelector('[data-naver-login]')?.addEventListener('click', () => {
-    social(root.querySelector('[data-naver-login]'), async () => {
-      const { signInWithNaver } = await import('./naver-login.js')
-      await signInWithNaver()
-    }, 'Naver')
   })
 
   root.querySelector('[data-guest-continue]')?.addEventListener('click', () => {

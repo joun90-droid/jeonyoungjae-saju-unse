@@ -40,9 +40,9 @@ function init() {
   maybeNotifyToday()
   const notice = document.getElementById('guestNotice')
   if (notice) {
-    let guest = false
-    try { guest = localStorage.getItem('isLoggedIn') === 'false' } catch { /* ignore */ }
-    if (consumeGuestNotice() || (guest && !sessionStorage.getItem('saju-guest-seen'))) {
+    let loggedIn = false
+    try { loggedIn = localStorage.getItem('isLoggedIn') === 'true' } catch { /* ignore */ }
+    if (!loggedIn && (consumeGuestNotice() || !sessionStorage.getItem('saju-guest-seen'))) {
       notice.hidden = false
       sessionStorage.setItem('saju-guest-seen', '1')
       notice.querySelector('[data-dismiss-guest]')?.addEventListener('click', () => {
