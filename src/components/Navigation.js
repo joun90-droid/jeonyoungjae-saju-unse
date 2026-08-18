@@ -13,7 +13,7 @@ export function authBarHtml(user = getCurrentUser()) {
     return `
       <div class="auth-inner">
         <span class="auth-badge auth-guest">게스트로 이용 중</span>
-        <button type="button" class="auth-btn auth-up" data-open-login>로그인</button>
+        <button type="button" class="auth-btn auth-up auth-login-cta" data-open-login>더 많은 기능을 사용하려면 로그인</button>
       </div>`
   }
   const premium = status !== 'free'
