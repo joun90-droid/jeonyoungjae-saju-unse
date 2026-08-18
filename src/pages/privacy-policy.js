@@ -1,0 +1,53 @@
+import { SITE } from './site.js'
+import { crumbs, pageTemplate } from './layout.js'
+
+export const PrivacyPolicy = {
+  title: '개인정보처리방침',
+  path: '/privacy-policy',
+  content: `
+    <div class="policy-page">
+      <section>
+        <h2>1. 개인정보 수집 범위</h2>
+        <p>본 앱(영재 사주운)은 생년월일과 성별 정보를 수집합니다. 이 정보는 사주 계산용으로만 사용되며 서버에 저장되지 않습니다.</p>
+      </section>
+      <section>
+        <h2>2. 데이터 처리 방식</h2>
+        <p>모든 사주 계산은 브라우저의 로컬 환경에서만 처리됩니다. 입력하신 생년월일과 성별 정보는 서버로 전송되지 않습니다.</p>
+      </section>
+      <section>
+        <h2>3. 광고 및 분석 (Google AdSense)</h2>
+        <p>본 앱은 Google AdSense를 통해 광고를 게시합니다. Google은 사용자의 방문 기록과 관심사를 바탕으로 맞춤형 광고를 제공할 수 있습니다. Google의 광고 정책은 <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google 개인정보 보호 정책</a> 및 <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer">광고에 사용되는 정보</a>에서 확인하실 수 있습니다.</p>
+        <p>맞춤 광고는 <a href="https://adssettings.google.com/" target="_blank" rel="noopener noreferrer">Google 광고 설정</a>에서 끌 수 있습니다.</p>
+      </section>
+      <section>
+        <h2>4. 쿠키 사용</h2>
+        <p>본 앱은 사용자 경험 개선과 광고 게재를 위해 쿠키를 사용할 수 있습니다. 언제든지 브라우저 설정에서 쿠키를 비활성화할 수 있습니다.</p>
+      </section>
+      <section>
+        <h2>5. 사용자 권리</h2>
+        <p>사용자는 언제든지 개인정보 열람, 수정, 삭제를 요청할 수 있습니다. 요청은 <a href="mailto:${SITE.email}">${SITE.email}</a>으로 문의해 주세요.</p>
+      </section>
+      <section>
+        <h2>6. 정책 변경</h2>
+        <p>본 개인정보처리방침은 예고 없이 변경될 수 있습니다. 변경사항이 있으면 본 페이지에 공지됩니다.</p>
+      </section>
+      <p class="page-date">최종 수정: ${SITE.effectiveDate}</p>
+    </div>
+  `,
+}
+
+export const meta = {
+  path: PrivacyPolicy.path,
+  title: `${PrivacyPolicy.title} | 영재 사주운`,
+  description: '영재 사주운 개인정보처리방침. 생년월일은 브라우저에서만 계산되며, Google AdSense 광고·쿠키 사용을 안내합니다.',
+}
+
+export function render() {
+  return pageTemplate({
+    kicker: 'Privacy',
+    title: PrivacyPolicy.title,
+    lead: '사주 입력값은 서버에 저장하지 않습니다. 광고·쿠키 사용을 안내합니다.',
+    crumbsHtml: crumbs([{ href: '/', label: '홈' }, { label: PrivacyPolicy.title }]),
+    body: PrivacyPolicy.content,
+  })
+}

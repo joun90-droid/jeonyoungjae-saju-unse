@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>영재 사주운 | 재물·연애·투자·직업·시기별 운세</title>
+  <meta name="description" content="사주팔자 기반 과거·현재·미래, 재물운, 연애운, 투자 손익 참고, 직업 적성 분석. 출생 정보는 브라우저에서만 계산됩니다.">
+  <meta name="keywords" content="사주, 사주팔자, 운세, 재물운, 연애운, 직업운, 오행, 띠, 사주궁합, 사주 계산, 영재 사주운">
+  <meta name="author" content="전영재">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#0c0a14">
+  <link rel="canonical" href="https://jeonyoungjae-saju-unse.web.app/">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ko_KR">
+  <meta property="og:site_name" content="영재 사주운">
+  <meta property="og:title" content="영재 사주운 | 재물·연애·투자·직업·시기별 운세">
+  <meta property="og:description" content="사주팔자로 재물·연애·투자 성향·직업 적성·시기별 흐름을 정리합니다. 계산은 브라우저에서만 처리됩니다.">
+  <meta property="og:url" content="https://jeonyoungjae-saju-unse.web.app/">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="영재 사주운 | 재물·연애·투자·직업·시기별 운세">
+  <meta name="twitter:description" content="사주팔자 기반 운세 분석. 출생 정보는 브라우저에서만 계산됩니다.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "영재 사주운",
+    "url": "https://jeonyoungjae-saju-unse.web.app/",
+    "applicationCategory": "LifestyleApplication",
+    "operatingSystem": "Any",
+    "inLanguage": "ko",
+    "description": "사주팔자 기반 재물·연애·투자·직업·시기별 운세 분석. 브라우저에서 계산합니다.",
+    "author": { "@type": "Person", "name": "전영재" },
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "KRW" }
+  }
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3079797618341925" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <a class="brand" href="/">
+        <span class="brand-icon">運</span>
+        <div>
+          <strong>영재 사주운</strong>
+          <small>Saju Fortune Engine</small>
+        </div>
+      </a>
+      <nav class="site-nav" aria-label="주요 메뉴">
+        <a href="/">홈</a>
+        <a href="/daily-fortune">오늘</a>
+        <a href="/compatibility">궁합</a>
+        <a href="/guide">가이드</a>
+      </nav>
+    </header>
+    <nav class="legal-nav" aria-label="개인정보 약관 소개 연락처">
+      <a href="/">홈</a>
+      <a href="/privacy-policy">개인정보</a>
+      <a href="/terms-of-service">약관</a>
+      <a href="/about-us">소개</a>
+      <a href="/contact">연락처</a>
+    </nav>
+
+    <main class="main">
+      <div id="homeView">
+        <section class="hero card">
+          <h1>사주로 보는<br><span>재물 · 연애 · 투자 · 직업 · 시기</span></h1>
+          <p class="hero-lead">생년월일시로 사주를 계산하고, 과거·현재·미래 흐름과 재물운·연애운·투자·직업 추천을 정리해 드립니다.</p>
+          <div class="tool-grid">
+            <a href="/daily-fortune">📅 오늘의 운세</a>
+            <a href="/psychology-test">🧪 심리테스트</a>
+            <a href="/compatibility">💞 궁합</a>
+            <a href="/chart">📊 만세력</a>
+            <a href="/tarot">🃏 타로</a>
+            <a href="/mbti">🔤 MBTI</a>
+          </div>
+        </section>
+
+        <form class="card form" id="birthForm">
+          <h2 class="form-title">출생 정보</h2>
+          <div class="row dates">
+            <label>생년월일 (양력)
+              <div class="date-grid">
+                <input type="number" id="year" min="1930" max="2026" value="1990" required>
+                <input type="number" id="month" min="1" max="12" value="5" required>
+                <input type="number" id="day" min="1" max="31" value="15" required>
+              </div>
+            </label>
+          </div>
+          <div class="row time-row">
+            <label class="time-label">시간
+              <div class="time-grid" id="timeInputs">
+                <input type="number" id="hour" min="0" max="23" value="14">
+                <span>:</span>
+                <input type="number" id="minute" min="0" max="59" value="30">
+              </div>
+            </label>
+            <label class="check unknown">
+              <input type="checkbox" id="unknownTime">
+              <span>시간 모름 → 질문으로 추정</span>
+            </label>
+          </div>
+          <div class="row detail-row">
+            <span class="label">해석 깊이</span>
+            <div class="seg seg-detail">
+              <button type="button" class="seg-btn" data-detail="mild">🍚 순한맛</button>
+              <button type="button" class="seg-btn active" data-detail="medium">🌶️ 중간맛</button>
+              <button type="button" class="seg-btn" data-detail="spicy">🔥 매운맛</button>
+            </div>
+            <p class="detail-hint">순한맛=핵심+짧은 상세 · 중간맛=장문 · 매운맛=최장문·정밀</p>
+          </div>
+          <div class="row gender-row">
+            <span class="label">성별</span>
+            <div class="seg">
+              <button type="button" class="seg-btn active" data-gender="M">남</button>
+              <button type="button" class="seg-btn" data-gender="F">여</button>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary">운세 분석하기</button>
+          <p class="privacy">🔒 계산은 브라우저에서만 처리됩니다. 서버로 출생 정보를 보내지 않습니다.</p>
+        </form>
+
+        <section class="card time-guess" id="timeGuessSection" hidden>
+          <h2 class="form-title">⏱ 시진(時辰) 추정 질문</h2>
+          <p class="guess-lead">태어난 시각을 모를 때, 생활·성격·출생 이야기로 12시진 중 가장 맞는 시간대를 찾습니다.</p>
+          <div id="guessQuiz">
+            <div class="guess-progress-wrap">
+              <div class="guess-progress-bar" id="guessProgress" style="--pct: 8%">1 / 10</div>
+            </div>
+            <p class="guess-q" id="guessQuestion"></p>
+            <div class="guess-options" id="guessOptions"></div>
+            <div class="guess-nav">
+              <button type="button" class="btn-ghost" id="guessPrev">이전</button>
+              <button type="button" class="btn-ghost" id="guessNext">다음</button>
+              <button type="button" class="btn-secondary" id="guessFinish" hidden>시진 추정하기</button>
+            </div>
+          </div>
+          <div id="guessResult" hidden>
+            <h3 class="guess-result-title">추정 결과</h3>
+            <p class="guess-reason" id="guessReason"></p>
+            <p class="guess-sub">후보를 눌러 바꿀 수 있습니다. 맞으면 「이 시간으로 분석」을 누르세요.</p>
+            <div class="guess-candidates" id="guessCandidates"></div>
+            <div class="guess-actions">
+              <button type="button" class="btn-secondary" id="guessApply">이 시간으로 분석</button>
+              <button type="button" class="btn-ghost" id="guessRetry">질문 다시하기</button>
+            </div>
+          </div>
+        </section>
+
+        <div id="results" class="results" hidden>
+          <section class="card pillar-card" id="pillarCard"></section>
+          <nav class="tabs" id="tabs" role="tablist">
+            <button type="button" class="tab active" data-tab="timeline">시기별</button>
+            <button type="button" class="tab" data-tab="wealth">재물운</button>
+            <button type="button" class="tab" data-tab="love">연애운</button>
+            <button type="button" class="tab" data-tab="invest">투자·손익</button>
+            <button type="button" class="tab" data-tab="career">직업·적성</button>
+          </nav>
+          <div id="panel" class="panels"></div>
+        </div>
+      </div>
+
+      <div id="pageView" hidden></div>
+    </main>
+
+    <footer class="footer">
+      <nav class="footer-nav" aria-label="도구">
+        <a href="/daily-fortune">오늘의 운세</a>
+        <a href="/psychology-test">심리테스트</a>
+        <a href="/compatibility">궁합</a>
+        <a href="/chart">만세력</a>
+        <a href="/tarot">타로</a>
+        <a href="/mbti">MBTI</a>
+        <a href="/premium">프리미엄</a>
+      </nav>
+      <nav class="footer-nav" aria-label="가이드">
+        <a href="/guide">사주 가이드</a>
+        <a href="/five-elements">오행</a>
+        <a href="/zodiac-signs">12띠</a>
+        <a href="/faq">FAQ</a>
+      </nav>
+      <nav class="footer-nav footer-legal" aria-label="정책">
+        <a href="/privacy-policy">개인정보처리방침</a>
+        <a href="/terms-of-service">이용약관</a>
+        <a href="/about-us">소개</a>
+        <a href="/contact">연락처</a>
+      </nav>
+      <p>본 서비스는 오락·참고용이며, 투자·의료·법률 조언이 아닙니다.</p>
+      <p>© 영재 사주운</p>
+    </footer>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
