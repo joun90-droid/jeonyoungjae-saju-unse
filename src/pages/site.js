@@ -11,6 +11,7 @@ export const NAV = [
   { href: '/daily-fortune', label: '오늘' },
   { href: '/compatibility', label: '궁합' },
   { href: '/guide', label: '가이드' },
+  { href: '/pricing', label: '요금' },
 ]
 
 export const TOOL_LINKS = [

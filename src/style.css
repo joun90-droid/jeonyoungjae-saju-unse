@@ -699,6 +699,89 @@ textarea { resize: vertical; min-height: 120px; line-height: 1.5; }
 .contact-form .btn-primary { margin-top: 4px; }
 .contact-fallback { font-size: 0.82rem; color: var(--gold); }
 
+.auth-bar {
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(12, 10, 20, 0.88);
+}
+.auth-inner {
+  max-width: var(--max);
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+}
+.auth-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.auth-google { background: #fff; color: #1f1f1f; }
+.auth-kakao { background: #fee500; color: #191919; }
+.auth-up {
+  background: rgba(124, 58, 237, 0.35);
+  color: var(--accent);
+}
+.auth-badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--good);
+}
+.auth-menu { position: relative; }
+.auth-menu summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  min-height: 44px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.auth-menu summary::-webkit-details-marker { display: none; }
+.auth-avatar {
+  width: 28px; height: 28px; border-radius: 999px; object-fit: cover;
+}
+.auth-avatar-fallback {
+  display: grid; place-items: center;
+  background: rgba(124, 58, 237, 0.35); color: var(--accent); font-weight: 800;
+}
+.auth-dropdown {
+  position: absolute; right: 0; top: calc(100% + 6px); z-index: 40;
+  width: 220px; padding: 12px;
+  border-radius: 12px; border: 1px solid var(--line);
+  background: var(--card);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+}
+.auth-dropdown p { margin: 0 0 6px; font-size: 0.8rem; }
+
+.login-actions { display: flex; flex-direction: column; gap: 10px; }
+.btn-google, .btn-kakao, .btn-block {
+  width: 100%;
+  min-height: 48px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.btn-google { background: #fff; color: #1f1f1f; }
+.btn-kakao { background: #fee500; color: #191919; }
+.login-status { margin: 8px 0 0; font-size: 0.85rem; color: var(--muted); }
+.login-status.is-error { color: var(--low); }
+
+@media (min-width: 900px) {
+  .price-grid { display: grid; grid-template-columns: repeat(3, 1fr); align-items: stretch; }
+}
+
 @media (max-width: 800px) {
   .legal-nav a,
   .footer-legal a {

@@ -2,6 +2,8 @@ import { computeChart } from './engine/calculator.js'
 import { startRouter } from './router.js'
 import { saveBirth, loadBirth } from './lib/store.js'
 import { maybeNotifyToday } from './lib/notify.js'
+import { initAuth } from './lib/auth.js'
+import { mountAuthBar } from './components/Navigation.js'
 
 import { analyzeOverall } from './engine/fortune.js'
 
@@ -32,6 +34,8 @@ let guessedTimeMeta = null
 
 
 function init() {
+  initAuth()
+  mountAuthBar()
   startRouter()
   maybeNotifyToday()
 

@@ -28,7 +28,7 @@ export const TermsOfService = {
       </section>
       <section>
         <h2>6. 기타</h2>
-        <p>본 약관은 한국 법률에 따라 해석되며, 분쟁은 소재지 관할 법원에서 처리됩니다. 문의: <a href="mailto:${SITE.email}">${SITE.email}</a></p>
+        <p>본 약관은 한국 법률에 따라 해석되며, 분쟁은 소재지 관할 법원에서 처리됩니다. 유료 결제는 Toss Payments를 이용하며, 결제 오류·환불 문의는 <a href="mailto:${SITE.email}">${SITE.email}</a>로 주세요.</p>
       </section>
       <p class="page-date">최종 수정: ${SITE.effectiveDate}</p>
     </div>

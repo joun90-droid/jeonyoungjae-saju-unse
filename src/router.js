@@ -5,10 +5,15 @@ import { bind as bindCompat, meta as compatibilityMeta, render as renderCompatib
 import { bind as bindDaily, meta as dailyMeta, render as renderDaily } from './pages/daily-fortune.js'
 import { meta as faqMeta, render as renderFaq } from './pages/faq.js'
 import { meta as fiveMeta, render as renderFive } from './pages/five-elements.js'
+import { bind as bindGoogleLogin, meta as loginMeta, render as renderLogin } from './pages/google-login.js'
 import { meta as guideMeta, render as renderGuide } from './pages/guide-index.js'
+import { bind as bindKakaoCb, meta as kakaoMeta, render as renderKakaoCb } from './pages/kakao-login.js'
 import { crumbs, pageTemplate } from './pages/layout.js'
 import { bind as bindMbti, meta as mbtiMeta, render as renderMbti } from './pages/mbti.js'
+import { meta as failMeta, render as renderFail } from './pages/payment-fail.js'
+import { bind as bindPayOk, meta as payOkMeta, render as renderPayOk } from './pages/payment-success.js'
 import { bind as bindPremium, meta as premiumMeta, render as renderPremium } from './pages/premium.js'
+import { bind as bindPricing, meta as pricingMeta, render as renderPricing } from './pages/pricing.js'
 import { meta as privacyMeta, render as renderPrivacy } from './pages/privacy.js'
 import { bind as bindPsy, meta as psyMeta, render as renderPsy } from './pages/psychology-test.js'
 import { SITE } from './pages/site.js'
@@ -43,6 +48,11 @@ const ROUTES = {
   '/tarot': { type: 'page', ...tarotMeta, render: renderTarot, bind: bindTarot },
   '/mbti': { type: 'page', ...mbtiMeta, render: renderMbti, bind: bindMbti },
   '/premium': { type: 'page', ...premiumMeta, render: renderPremium, bind: bindPremium },
+  '/pricing': { type: 'page', ...pricingMeta, render: renderPricing, bind: bindPricing },
+  '/login': { type: 'page', ...loginMeta, render: renderLogin, bind: bindGoogleLogin },
+  '/auth/kakao/callback': { type: 'page', ...kakaoMeta, render: renderKakaoCb, bind: bindKakaoCb },
+  '/payment-success': { type: 'page', ...payOkMeta, render: renderPayOk, bind: bindPayOk },
+  '/payment-fail': { type: 'page', ...failMeta, render: renderFail },
 }
 
 export function normalizePath(pathname) {
@@ -114,7 +124,9 @@ function navMatch(path) {
   if (path === '/terms' || path === '/terms-of-service') return '/terms-of-service'
   if (path === '/about' || path === '/about-us') return '/about-us'
   if (path === '/contact') return '/contact'
-  if (path === '/premium') return '/about'
+  if (path === '/premium' || path === '/pricing' || path === '/login' || path === '/payment-success' || path === '/payment-fail') {
+    return '/pricing'
+  }
   return '/guide'
 }
 
@@ -201,12 +213,12 @@ export function startRouter() {
     const url = new URL(a.href, location.origin)
     const next = normalizePath(url.pathname)
     const cur = normalizePath(location.pathname)
-    if (next === cur && !url.hash) {
+    if (next === cur && url.search === location.search && !url.hash) {
       e.preventDefault()
       return
     }
     e.preventDefault()
-    history.pushState({}, '', next)
+    history.pushState({}, '', `${next}${url.search}`)
     renderRoute()
   })
 

@@ -8,11 +8,12 @@ export const PrivacyPolicy = {
     <div class="policy-page">
       <section>
         <h2>1. 개인정보 수집 범위</h2>
-        <p>본 앱(영재 사주운)은 생년월일과 성별 정보를 수집합니다. 이 정보는 사주 계산용으로만 사용되며 서버에 저장되지 않습니다.</p>
+        <p>본 앱(영재 사주운)은 사주 계산을 위해 생년월일과 성별 정보를 브라우저에서만 사용합니다. 이 값은 서버에 저장되지 않습니다.</p>
+        <p>Google 또는 Kakao로 로그인하면 이메일, 이름, 프로필 사진이 계정 식별을 위해 Firebase Authentication에 저장됩니다. 결제를 하면 주문번호·금액·구독 기간이 서버에 기록됩니다.</p>
       </section>
       <section>
         <h2>2. 데이터 처리 방식</h2>
-        <p>모든 사주 계산은 브라우저의 로컬 환경에서만 처리됩니다. 입력하신 생년월일과 성별 정보는 서버로 전송되지 않습니다.</p>
+        <p>사주 계산은 브라우저의 로컬 환경에서만 처리되며, 생년월일·성별은 서버로 전송되지 않습니다. 로그인·결제 정보는 Firebase(Authentication/Functions)와 Toss Payments를 통해 처리됩니다.</p>
       </section>
       <section>
         <h2>3. 광고 및 분석 (Google AdSense)</h2>
@@ -25,10 +26,14 @@ export const PrivacyPolicy = {
       </section>
       <section>
         <h2>5. 사용자 권리</h2>
-        <p>사용자는 언제든지 개인정보 열람, 수정, 삭제를 요청할 수 있습니다. 요청은 <a href="mailto:${SITE.email}">${SITE.email}</a>으로 문의해 주세요.</p>
+        <p>사용자는 언제든지 개인정보 열람, 수정, 삭제를 요청할 수 있습니다. 요청은 <a href="mailto:${SITE.email}">${SITE.email}</a>으로 문의해 주세요. 로그아웃은 화면 상단 프로필 메뉴에서 할 수 있습니다.</p>
       </section>
       <section>
-        <h2>6. 정책 변경</h2>
+        <h2>6. 결제 정보</h2>
+        <p>유료 구독은 Toss Payments를 통해 처리됩니다. 카드 번호는 본 앱 서버에 저장되지 않으며 Toss의 결제 정책이 적용됩니다.</p>
+      </section>
+      <section>
+        <h2>7. 정책 변경</h2>
         <p>본 개인정보처리방침은 예고 없이 변경될 수 있습니다. 변경사항이 있으면 본 페이지에 공지됩니다.</p>
       </section>
       <p class="page-date">최종 수정: ${SITE.effectiveDate}</p>

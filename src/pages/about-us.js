@@ -15,9 +15,9 @@ export const AboutUs = {
         <p>본 앱은 다음과 같은 기술로 구현되었습니다:</p>
         <ul>
           <li>Vite + Vanilla JS (빠른 로딩)</li>
-          <li>브라우저 기반 계산 (서버로 출생 정보를 보내지 않음)</li>
-          <li>개인정보 보호 (로컬 저장만)</li>
-          <li>Firebase Hosting (안정적 서비스)</li>
+          <li>브라우저 기반 사주 계산 (출생 정보는 서버로 보내지 않음)</li>
+          <li>선택적 Google/Kakao 로그인 (구독·결제용)</li>
+          <li>Firebase Hosting · Authentication</li>
           <li>오픈소스 라이브러리 활용</li>
         </ul>
       </section>

@@ -12,6 +12,6 @@ alwaysApply: true
 의미 있는 코드 변경이 끝나면 사용자에게 묻지 말고 바로:
 
 1. `git add` → `git commit` → `git push origin main`
-2. `npm run build` → `firebase deploy --only hosting:sajuunse`
+2. `npm run build` → `firebase deploy --only functions,hosting:sajuunse`
 
 커밋할 게 없으면 push는 건너뛰고 배포만 한다. Cloud Run은 쓰지 않는다. `.env`·자격 증명은 커밋하지 않는다.
