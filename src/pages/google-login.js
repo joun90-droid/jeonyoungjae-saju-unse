@@ -11,6 +11,7 @@ import {
 } from 'firebase/auth'
 import { authErrorMessage, continueWithoutLogin, getCurrentUser, saveProfile, signOut } from '../lib/auth.js'
 import { getFirebaseAuth } from '../lib/firebase.js'
+import { SITE } from './site.js'
 
 const EMAIL_KEY = 'saju-saved-email'
 const REMEMBER_KEY = 'saju-remember-login'
@@ -98,6 +99,7 @@ export function render() {
           <a href="/privacy-policy">개인정보</a>
           <a href="/terms-of-service">약관</a>
           <a href="/">홈</a>
+          <a href="mailto:${SITE.email}">${SITE.email}</a>
         </div>
       </div>
     </div>`
