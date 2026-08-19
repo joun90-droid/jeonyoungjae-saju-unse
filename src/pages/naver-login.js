@@ -1,4 +1,4 @@
-import { signInWithCustomToken } from 'firebase/auth'
+import { signInWithCustomToken, setPersistence, browserLocalPersistence } from 'firebase/auth'
 import { getCurrentUser, goSajuHomeAfterLogin, postJson, signOut } from '../lib/auth.js'
 import { getFirebaseAuth, NAVER_CLIENT_ID } from '../lib/firebase.js'
 
@@ -36,9 +36,12 @@ export async function exchangeNaverCode(code) {
     code,
     redirectUri: naverRedirectUri(),
   })
+  await setPersistence(getFirebaseAuth(), browserLocalPersistence)
   const cred = await signInWithCustomToken(getFirebaseAuth(), customToken)
-  const { saveProfile } = await import('../lib/auth.js')
-  await saveProfile(cred.user)
+  try {
+    const { saveProfile } = await import('../lib/auth.js')
+    await saveProfile(cred.user)
+  } catch { /* 프로필 저장 실패해도 로그인은 유지 */ }
   return cred.user
 }
 

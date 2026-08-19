@@ -83,10 +83,21 @@ export async function consumePendingSocialAuth() {
   try { sessionStorage.removeItem('saju-oauth-pending') } catch { /* ignore */ }
   let data
   try { data = JSON.parse(raw) } catch { return }
-  if (data.error || !data.code) {
-    if (data.error) {
-      try { sessionStorage.setItem('saju-oauth-error', data.error) } catch { /* ignore */ }
+
+  const showFail = async (message) => {
+    try { sessionStorage.setItem('saju-oauth-error', message) } catch { /* ignore */ }
+    const { openLogin } = await import('../pages/google-login.js')
+    openLogin({ next: '/#birthForm' })
+    const status = document.querySelector('[data-login-status]')
+    if (status) {
+      status.hidden = false
+      status.textContent = message
+      status.classList.add('is-error')
     }
+  }
+
+  if (data.error || !data.code) {
+    await showFail(data.error || '카카오 로그인을 완료하지 못했습니다.')
     return
   }
   const stateKey = data.provider === 'naver' ? 'saju_naver_oauth_state' : 'saju_kakao_oauth_state'
@@ -94,7 +105,7 @@ export async function consumePendingSocialAuth() {
   try { expected = sessionStorage.getItem(stateKey) || '' } catch { /* ignore */ }
   try { sessionStorage.removeItem(stateKey) } catch { /* ignore */ }
   if (expected && data.state !== expected) {
-    try { sessionStorage.setItem('saju-oauth-error', '로그인 검증에 실패했습니다. 다시 시도해 주세요.') } catch { /* ignore */ }
+    await showFail('로그인 검증에 실패했습니다. 다시 시도해 주세요.')
     return
   }
   try {
@@ -106,16 +117,10 @@ export async function consumePendingSocialAuth() {
       await exchangeKakaoCode(data.code)
     }
     goSajuHomeAfterLogin()
+    const { renderAuthBar } = await import('../components/Navigation.js')
+    renderAuthBar()
   } catch (err) {
-    try { sessionStorage.setItem('saju-oauth-error', err.message || '로그인에 실패했습니다.') } catch { /* ignore */ }
-    const { openLogin } = await import('../pages/google-login.js')
-    openLogin({ next: '/#birthForm' })
-    const status = document.querySelector('[data-login-status]')
-    if (status) {
-      status.hidden = false
-      status.textContent = err.message || '로그인에 실패했습니다.'
-      status.classList.add('is-error')
-    }
+    await showFail(err.message || '로그인에 실패했습니다.')
   }
 }
 

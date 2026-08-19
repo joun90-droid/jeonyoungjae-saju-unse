@@ -175,7 +175,13 @@ app.post('/api/social-auth', async (req, res) => {
       const tokenJson = await tokenRes.json()
       if (!tokenRes.ok) {
         logger.error('Kakao 토큰 교환 실패', tokenJson)
-        return res.status(401).json({ error: '카카오 인증에 실패했습니다. Redirect URI를 Kakao Developers에 등록했는지 확인해 주세요.' })
+        const kakaoErr = String(tokenJson.error_description || tokenJson.error || '')
+        const needsSecret = /secret|KOE101|KOE010|invalid_client/i.test(kakaoErr)
+        return res.status(401).json({
+          error: needsSecret
+            ? '카카오 클라이언트 시크릿이 맞지 않습니다. 카카오 콘솔에서 클라이언트 시크릿 사용을 끄거나, 시크릿 값을 알려 주세요.'
+            : (kakaoErr ? `카카오 인증 실패: ${kakaoErr}` : '카카오 인증에 실패했습니다. Redirect URI를 Kakao Developers에 등록했는지 확인해 주세요.'),
+        })
       }
 
       const meRes = await fetch('https://kapi.kakao.com/v2/user/me', {
@@ -185,7 +191,7 @@ app.post('/api/social-auth', async (req, res) => {
       if (!meRes.ok || !me.id) {
         return res.status(401).json({ error: '카카오 사용자 정보를 가져오지 못했습니다.' })
       }
-      uid = `saju:kakao:${me.id}`
+      uid = `saju_kakao_${me.id}`
       displayName = me.kakao_account?.profile?.nickname || undefined
       email = me.kakao_account?.email || undefined
       photoURL = me.kakao_account?.profile?.profile_image_url || undefined
@@ -215,7 +221,7 @@ app.post('/api/social-auth', async (req, res) => {
       if (me.resultcode !== '00' || !me.response?.id) {
         return res.status(401).json({ error: '네이버 사용자 정보를 가져오지 못했습니다.' })
       }
-      uid = `saju:naver:${me.response.id}`
+      uid = `saju_naver_${me.response.id}`
       displayName = me.response.name || me.response.nickname || undefined
       email = me.response.email || undefined
       photoURL = me.response.profile_image || undefined
@@ -229,7 +235,7 @@ app.post('/api/social-auth', async (req, res) => {
       provider,
       updatedAt: FieldValue.serverTimestamp(),
     }, { merge: true })
-    const customToken = await getAuth().createCustomToken(uid, { provider, app: 'saju-unse' })
+    const customToken = await getAuth().createCustomToken(String(uid).slice(0, 128), { provider, app: 'saju-unse' })
     res.json({ customToken })
   } catch (err) {
     logger.error('social-auth 오류', err)

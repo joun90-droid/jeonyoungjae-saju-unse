@@ -3,7 +3,7 @@ import { startRouter } from './router.js'
 import { saveBirth, loadBirth } from './lib/store.js'
 import { maybeNotifyToday } from './lib/notify.js'
 import { consumeGuestNotice, consumePendingSocialAuth, initAuth } from './lib/auth.js'
-import { mountAuthBar } from './components/Navigation.js'
+import { mountAuthBar, renderAuthBar } from './components/Navigation.js'
 import { mountLogin } from './pages/google-login.js'
 
 import { analyzeOverall } from './engine/fortune.js'
@@ -38,7 +38,13 @@ function init() {
   initAuth()
   mountAuthBar()
   mountLogin()
-  consumePendingSocialAuth()
+  const bar = document.getElementById('authBar')
+  try {
+    if (bar && sessionStorage.getItem('saju-oauth-pending')) {
+      bar.innerHTML = '<div class="auth-inner"><span class="auth-badge">로그인 처리 중</span></div>'
+    }
+  } catch { /* ignore */ }
+  consumePendingSocialAuth().then(() => renderAuthBar())
   startRouter()
   maybeNotifyToday()
   const notice = document.getElementById('guestNotice')
