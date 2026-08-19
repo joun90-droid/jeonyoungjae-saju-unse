@@ -182,7 +182,7 @@ function renderRoute() {
   }
 
   homeView.hidden = true
-  pageView.hidden = false
+  pageView.hidden = path.startsWith('/auth/')
   pageView.innerHTML = route.render()
   route.bind?.(pageView)
   updateHead(route, path)
