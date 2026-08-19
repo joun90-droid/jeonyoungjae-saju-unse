@@ -18,7 +18,7 @@ export function relatedGuides(currentHref) {
       <div class="related-grid">
         ${links.map((l) => `<a href="${l.href}">${l.label}</a>`).join('')}
       </div>
-      <a class="btn-primary related-cta" href="/">운세 분석하러 가기</a>
+      <a class="btn-ghost related-cta" href="/">운세 분석하러 가기</a>
     </nav>`
 }
 

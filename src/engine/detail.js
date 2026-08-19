@@ -12,9 +12,9 @@ import {
 } from './narrative.js'
 
 export const DETAIL_LEVELS = {
-  mild: { id: 'mild', label: '순한맛', emoji: '🍚', desc: '핵심+짧은 상세' },
-  medium: { id: 'medium', label: '중간맛', emoji: '🌶️', desc: '풀어서 장문' },
-  spicy: { id: 'spicy', label: '매운맛', emoji: '🔥', desc: '정밀·최장문' },
+  mild: { id: 'mild', label: '순한맛', desc: '핵심+짧은 상세' },
+  medium: { id: 'medium', label: '중간맛', desc: '풀어서 장문' },
+  spicy: { id: 'spicy', label: '매운맛', desc: '정밀·최장문' },
 }
 
 /**

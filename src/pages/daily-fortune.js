@@ -16,10 +16,10 @@ export const meta = {
 }
 
 const KEYS = [
-  { id: 'love', emoji: '💕', title: '애정운' },
-  { id: 'wealth', emoji: '💰', title: '재물운' },
-  { id: 'job', emoji: '💼', title: '직업운' },
-  { id: 'hope', emoji: '✨', title: '소망운' },
+  { id: 'love', title: '애정운' },
+  { id: 'wealth', title: '재물운' },
+  { id: 'job', title: '직업운' },
+  { id: 'hope', title: '소망운' },
 ]
 
 function daysAgo(n) {
@@ -94,7 +94,7 @@ function mount(el, date) {
         return `
           <article class="fortune-mini">
             <header>
-              <h3>${k.emoji} ${k.title}</h3>
+              <h3>${k.title}</h3>
               <span class="score ${item.level.cls}">${item.score}</span>
             </header>
             <p class="one-liner">${item.text}</p>
@@ -107,7 +107,7 @@ function mount(el, date) {
       ${sorted.slice(0, 35).map((d) => {
         const ago = (new Date(today) - new Date(d)) / 86400000
         const locked = !premium && ago > ageLimit
-        return `<button type="button" class="cal-day ${d === date ? 'active' : ''} ${locked ? 'locked' : ''}" data-date="${d}">${d.slice(5)}${locked ? ' 🔒' : ''}</button>`
+        return `<button type="button" class="cal-day ${d === date ? 'active' : ''} ${locked ? 'locked' : ''}" data-date="${d}">${d.slice(5)}${locked ? ' 잠김' : ''}</button>`
       }).join('')}
     </div>
     <p class="privacy">${premium ? '이력이 이 기기에 저장됩니다.' : '무료는 최근 7일만 열립니다.'}</p>
@@ -115,7 +115,7 @@ function mount(el, date) {
       <label class="check"><input type="checkbox" id="notifyOn" ${state.notificationEnabled ? 'checked' : ''}> 브라우저 알림 (방문 시, ${premium ? '설정 시각 이후' : '오전 6시 이후'})</label>
       ${premium ? `<label class="notify-hour">시각 <input type="number" id="notifyHour" min="0" max="23" value="${state.notificationHour || 6}"></label>` : '<p class="privacy">알림 시간 변경은 프리미엄입니다. 서버 푸시(FCM)는 비용·Blaze 플랜이 필요해 넣지 않았습니다.</p>'}
     </div>
-    <p class="privacy">🔒 운세는 이 브라우저에만 저장됩니다. Firebase에 올리지 않습니다.</p>
+    <p class="privacy">운세는 이 브라우저에만 저장됩니다. Firebase에 올리지 않습니다.</p>
   `
 
   el.querySelectorAll('[data-open-paywall]').forEach((b) => {

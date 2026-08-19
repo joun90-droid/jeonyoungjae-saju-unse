@@ -16,12 +16,12 @@ export const NAV = [
 ]
 
 export const TOOL_LINKS = [
-  { href: '/daily-fortune', label: '오늘의 운세', emoji: '📅' },
-  { href: '/psychology-test', label: '심리테스트', emoji: '🧪' },
-  { href: '/compatibility', label: '궁합 분석', emoji: '💞' },
-  { href: '/chart', label: '만세력', emoji: '📊' },
-  { href: '/tarot', label: '타로', emoji: '🃏' },
-  { href: '/mbti', label: 'MBTI', emoji: '🔤' },
+  { href: '/daily-fortune', label: '오늘의 운세' },
+  { href: '/psychology-test', label: '심리테스트' },
+  { href: '/compatibility', label: '궁합 분석' },
+  { href: '/chart', label: '만세력' },
+  { href: '/tarot', label: '타로' },
+  { href: '/mbti', label: 'MBTI' },
 ]
 
 export const GUIDE_LINKS = [

@@ -60,7 +60,7 @@ export function render() {
             <li>업데이트 평생 포함</li>
           </ul>
           <button type="button" class="btn-secondary btn-block" data-pay="lifetime" ${lifeOn ? 'disabled' : ''}>
-            ${lifeOn ? '구독 중 ✓' : '평생 구독하기'}
+            ${lifeOn ? '구독 중' : '평생 구독하기'}
           </button>
           <p class="privacy">로그인 후 Toss로 결제</p>
         </article>

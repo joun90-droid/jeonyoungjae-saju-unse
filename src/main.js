@@ -552,11 +552,11 @@ function renderPillars(pillarCard) {
 
   const timeBadge = meta.guessedTime
 
-    ? `<p class="guess-badge">⏱ 추정 ${meta.guessedTime.label} (${meta.guessedTime.range}) · 신뢰 ${meta.guessedTime.confidence}%</p>`
+    ? `<p class="guess-badge">추정 ${meta.guessedTime.label} (${meta.guessedTime.range}) · 신뢰 ${meta.guessedTime.confidence}%</p>`
 
     : ''
 
-  const detailBadge = `<span class="detail-badge">${detailLevel === 'spicy' ? '🔥 매운맛' : detailLevel === 'medium' ? '🌶️ 중간맛' : '🍚 순한맛'}</span>`
+  const detailBadge = `<span class="detail-badge">${detailLevel === 'spicy' ? '매운맛' : detailLevel === 'medium' ? '중간맛' : '순한맛'}</span>`
 
 
 
@@ -636,7 +636,7 @@ function renderPanel(panel) {
 
   if (activeTab === 'wealth') {
 
-    html += detailBlock(wealth, '💰', detailLevel)
+    html += detailBlock(wealth, detailLevel)
 
     panel.innerHTML = html
 
@@ -646,7 +646,7 @@ function renderPanel(panel) {
 
   if (activeTab === 'love') {
 
-    html += detailBlock(love, '💕', detailLevel)
+    html += detailBlock(love, detailLevel)
 
     panel.innerHTML = html
 
@@ -656,7 +656,7 @@ function renderPanel(panel) {
 
   if (activeTab === 'invest') {
 
-    html += detailBlock(invest, '📈', detailLevel)
+    html += detailBlock(invest, detailLevel)
 
     if (invest.scenarios) {
 
@@ -720,7 +720,7 @@ function fortuneBlock(t, level) {
 
 
 
-function detailBlock(data, emoji, level) {
+function detailBlock(data, level) {
 
   const tips = level === 'mild' ? data.tips.slice(0, 3) : data.tips
 
@@ -730,7 +730,7 @@ function detailBlock(data, emoji, level) {
 
       <header>
 
-        <h3>${emoji} ${data.headline}</h3>
+        <h3>${data.headline}</h3>
 
         <span class="score ${data.level.cls}">${data.score} · ${data.level.label}</span>
 
@@ -756,7 +756,7 @@ function careerBlock(career, level) {
   let html = `
     <article class="card fortune detail ${level}">
       <header>
-        <h3>💼 ${career.headline}</h3>
+        <h3>${career.headline}</h3>
         <span class="score ${career.level.cls}">${career.score} · ${career.level.label}</span>
       </header>
       <p class="summary">${career.summary}</p>
@@ -778,7 +778,7 @@ function careerBlock(career, level) {
   if (level !== 'mild' && career.caution?.length) {
     html += `
       <div class="card sub caution-list">
-        <h4>⚠️ 상대적으로 결이 덜 맞을 수 있는 분야</h4>
+        <h4>상대적으로 결이 덜 맞을 수 있는 분야</h4>
         <ul>${career.caution.map((c) => `<li><strong>${c.title}</strong> — ${c.reason}</li>`).join('')}</ul>
       </div>`
   }

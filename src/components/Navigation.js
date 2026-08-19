@@ -32,7 +32,7 @@ export function authBarHtml(user = getCurrentUser()) {
         </div>
       </details>
       ${premium
-        ? `<span class="auth-badge">구독 중 ✓</span>`
+        ? `<span class="auth-badge">Premium</span>`
         : `<a class="auth-btn auth-up" href="/pricing">프리미엄 업그레이드</a>`}
     </div>`
 }
