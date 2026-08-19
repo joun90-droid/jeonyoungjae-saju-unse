@@ -14,6 +14,10 @@ const KAKAO_REST_API_KEY = defineSecret('SAJU_KAKAO_REST_API_KEY')
 const KAKAO_CLIENT_SECRET = defineSecret('SAJU_KAKAO_CLIENT_SECRET')
 const NAVER_CLIENT_ID = defineSecret('SAJU_NAVER_CLIENT_ID')
 const NAVER_CLIENT_SECRET = defineSecret('SAJU_NAVER_CLIENT_SECRET')
+const RESEND_API_KEY = defineSecret('RESEND_API_KEY')
+
+const CONTACT_TO = 'joun90@gmail.com'
+const CONTACT_FROM = '영재 사주운 문의 <onboarding@resend.dev>'
 
 const MONTHLY = 4900
 const LIFETIME = 29900
@@ -27,6 +31,12 @@ const ALLOWED = [
 function secretValue(param) {
   const v = (param.value() || '').trim()
   return v && v !== 'unset' ? v : ''
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, (ch) => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]
+  ))
 }
 
 const OTHER_PRODUCT_KAKAO = 'a306f0ec0377e4d6c21746eed1c59af2'
@@ -82,6 +92,65 @@ const app = express()
 app.use(cors({ origin: ALLOWED, credentials: true }))
 app.use(express.json())
 
+app.post('/api/contact', async (req, res) => {
+  const { name, email, subject, message } = req.body || {}
+  if (!name || !email || !message) {
+    return res.status(400).json({ error: '이름·이메일·내용은 필수입니다.' })
+  }
+
+  const db = getFirestore()
+  let stored = false
+  try {
+    await db.collection('saju_contact_messages').add({
+      name: String(name).slice(0, 80),
+      email: String(email).slice(0, 200),
+      subject: String(subject || '').slice(0, 120),
+      message: String(message).slice(0, 4000),
+      createdAt: FieldValue.serverTimestamp(),
+    })
+    stored = true
+  } catch (err) {
+    logger.error('문의 Firestore 저장 실패', err)
+  }
+
+  let emailed = false
+  const apiKey = secretValue(RESEND_API_KEY)
+  if (apiKey) {
+    const mailSubject = `[영재 사주운] ${subject || '문의'} — ${name}`
+    const html = `
+      <div style="font-family: -apple-system, 'Malgun Gothic', sans-serif; max-width: 480px; margin: 0 auto; color: #1c1c1c;">
+        <h1 style="font-size: 18px; margin: 0 0 16px;">사주운 문의</h1>
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+          <tr><td style="padding: 6px 0; color: #888; width: 90px;">이름</td><td style="padding: 6px 0;">${escapeHtml(name)}</td></tr>
+          <tr><td style="padding: 6px 0; color: #888;">이메일</td><td style="padding: 6px 0;">${escapeHtml(email)}</td></tr>
+          <tr><td style="padding: 6px 0; color: #888;">제목</td><td style="padding: 6px 0;">${escapeHtml(subject || '')}</td></tr>
+        </table>
+        <div style="margin-top: 16px; padding: 12px 14px; background: #f4f4f4; border-radius: 10px; white-space: pre-wrap; font-size: 14px;">${escapeHtml(message)}</div>
+      </div>`
+    try {
+      const r = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ from: CONTACT_FROM, to: [CONTACT_TO], reply_to: email, subject: mailSubject, html }),
+      })
+      if (r.ok) {
+        emailed = true
+      } else {
+        logger.error(`Resend 발송 실패 (${r.status}): ${await r.text()}`)
+      }
+    } catch (err) {
+      logger.error('Resend 호출 오류', err)
+    }
+  } else {
+    logger.warn('RESEND_API_KEY가 설정되지 않아 문의 메일을 보내지 못했습니다. Firestore에는 저장됨.')
+  }
+
+  if (!stored && !emailed) {
+    return res.status(500).json({ error: '문의 접수에 실패했습니다. 잠시 후 다시 시도해 주세요.' })
+  }
+  res.json({ ok: true, stored, emailed })
+})
+
 app.get('/api/profile', async (req, res) => {
   const decoded = await requireUser(req, res)
   if (!decoded) return
@@ -120,15 +189,53 @@ app.get('/api/subscription', async (req, res) => {
   const decoded = await requireUser(req, res)
   if (!decoded) return
   const snap = await getFirestore().collection('saju_subscriptions').doc(decoded.uid).get()
-  if (!snap.exists) return res.json({ plan: 'free' })
+  if (!snap.exists) return res.json({ plan: 'free', status: 'none' })
   const data = snap.data()
   const endsAt = data.endsAt || null
   const expired = data.plan === 'premium_monthly' && endsAt && Date.now() > new Date(endsAt).getTime()
   res.json({
     plan: expired ? 'free' : (data.plan || 'free'),
+    status: expired ? 'expired' : (data.status || 'active'),
     startedAt: data.startedAt || null,
     endsAt,
+    canceledAt: data.canceledAt ? data.canceledAt.toDate?.().toISOString() ?? data.canceledAt : null,
+    amount: data.amount ?? null,
+    method: data.method || null,
+    orderId: data.orderId || null,
   })
+})
+
+app.post('/api/subscription/cancel', async (req, res) => {
+  const decoded = await requireUser(req, res)
+  if (!decoded) return
+  const ref = getFirestore().collection('saju_subscriptions').doc(decoded.uid)
+  const snap = await ref.get()
+  if (!snap.exists) return res.status(400).json({ error: '취소할 구독이 없습니다.' })
+  const data = snap.data()
+  if (data.plan !== 'premium_monthly') {
+    return res.status(400).json({ error: '평생 구독은 자동으로 갱신되지 않아 취소가 필요 없습니다. 환불 문의는 고객센터로 연락해 주세요.' })
+  }
+  const endsAt = data.endsAt || null
+  if (endsAt && Date.now() > new Date(endsAt).getTime()) {
+    return res.status(400).json({ error: '이미 만료된 구독입니다.' })
+  }
+  await ref.set({ status: 'canceled', canceledAt: FieldValue.serverTimestamp() }, { merge: true })
+  res.json({ ok: true, plan: data.plan, status: 'canceled', endsAt })
+})
+
+app.post('/api/subscription/reactivate', async (req, res) => {
+  const decoded = await requireUser(req, res)
+  if (!decoded) return
+  const ref = getFirestore().collection('saju_subscriptions').doc(decoded.uid)
+  const snap = await ref.get()
+  if (!snap.exists) return res.status(400).json({ error: '재활성화할 구독이 없습니다.' })
+  const data = snap.data()
+  const endsAt = data.endsAt || null
+  if (data.plan !== 'premium_monthly' || !endsAt || Date.now() > new Date(endsAt).getTime()) {
+    return res.status(400).json({ error: '재활성화할 수 없습니다. 기간이 이미 끝났다면 다시 구독해 주세요.' })
+  }
+  await ref.set({ status: 'active', canceledAt: FieldValue.delete() }, { merge: true })
+  res.json({ ok: true, plan: data.plan, status: 'active', endsAt })
 })
 
 function isSajuRedirect(redirectUri) {
@@ -316,7 +423,7 @@ app.use((req, res) => res.status(404).json({ error: 'not found' }))
 exports.sajuApi = onRequest(
   {
     region: 'asia-northeast3',
-    secrets: [TOSS_SECRET_KEY, KAKAO_REST_API_KEY, KAKAO_CLIENT_SECRET, NAVER_CLIENT_ID, NAVER_CLIENT_SECRET],
+    secrets: [TOSS_SECRET_KEY, KAKAO_REST_API_KEY, KAKAO_CLIENT_SECRET, NAVER_CLIENT_ID, NAVER_CLIENT_SECRET, RESEND_API_KEY],
   },
   app,
 )
