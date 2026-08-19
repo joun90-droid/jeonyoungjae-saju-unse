@@ -1,3 +1,4 @@
+import { bind as bindAccount, meta as accountMeta, render as renderAccount } from './pages/account.js'
 import { meta as aboutMeta, render as renderAbout } from './pages/about.js'
 import { bind as bindChart, meta as chartMeta, render as renderChart } from './pages/chart.js'
 import { bind as bindContact, meta as contactMeta, render as renderContact } from './pages/contact.js'
@@ -49,6 +50,7 @@ const ROUTES = {
   '/mbti': { type: 'page', ...mbtiMeta, render: renderMbti, bind: bindMbti },
   '/premium': { type: 'page', ...premiumMeta, render: renderPremium, bind: bindPremium },
   '/pricing': { type: 'page', ...pricingMeta, render: renderPricing, bind: bindPricing },
+  '/account': { type: 'page', ...accountMeta, render: renderAccount, bind: bindAccount },
   '/auth/kakao/callback': { type: 'page', ...kakaoMeta, render: renderKakaoCb, bind: bindKakaoCb },
   '/auth/naver/callback': { type: 'page', ...naverMeta, render: renderNaverCb, bind: bindNaverCb },
   '/payment-success': { type: 'page', ...payOkMeta, render: renderPayOk, bind: bindPayOk },
@@ -124,7 +126,7 @@ function navMatch(path) {
   if (path === '/terms' || path === '/terms-of-service') return '/terms-of-service'
   if (path === '/about' || path === '/about-us') return '/about-us'
   if (path === '/contact') return '/contact'
-  if (path === '/premium' || path === '/pricing' || path === '/payment-success' || path === '/payment-fail') {
+  if (path === '/premium' || path === '/pricing' || path === '/payment-success' || path === '/payment-fail' || path === '/account') {
     return '/pricing'
   }
   return '/guide'
