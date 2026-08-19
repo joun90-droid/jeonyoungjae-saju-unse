@@ -10,10 +10,10 @@ const cors = require('cors')
 initializeApp()
 
 const TOSS_SECRET_KEY = defineSecret('TOSS_SECRET_KEY')
-const KAKAO_REST_API_KEY = defineSecret('KAKAO_REST_API_KEY')
-const KAKAO_CLIENT_SECRET = defineSecret('KAKAO_CLIENT_SECRET')
-const NAVER_CLIENT_ID = defineSecret('NAVER_CLIENT_ID')
-const NAVER_CLIENT_SECRET = defineSecret('NAVER_CLIENT_SECRET')
+const KAKAO_REST_API_KEY = defineSecret('SAJU_KAKAO_REST_API_KEY')
+const KAKAO_CLIENT_SECRET = defineSecret('SAJU_KAKAO_CLIENT_SECRET')
+const NAVER_CLIENT_ID = defineSecret('SAJU_NAVER_CLIENT_ID')
+const NAVER_CLIENT_SECRET = defineSecret('SAJU_NAVER_CLIENT_SECRET')
 
 const MONTHLY = 4900
 const LIFETIME = 29900
@@ -27,6 +27,15 @@ const ALLOWED = [
 function secretValue(param) {
   const v = (param.value() || '').trim()
   return v && v !== 'unset' ? v : ''
+}
+
+const OTHER_PRODUCT_KAKAO = 'a306f0ec0377e4d6c21746eed1c59af2'
+const OTHER_PRODUCT_NAVER = 'dQGR7vaNyM47CAXcoDzt'
+
+function sajuClientId(value, blocked) {
+  const key = secretValue(value)
+  if (!key || key === blocked) return ''
+  return key
 }
 
 async function requireUser(req, res) {
@@ -147,8 +156,8 @@ app.post('/api/social-auth', async (req, res) => {
     let photoURL
 
     if (provider === 'kakao') {
-      const clientId = secretValue(KAKAO_REST_API_KEY)
-      if (!clientId) return res.status(500).json({ error: '카카오 로그인이 아직 설정되지 않았습니다.' })
+      const clientId = sajuClientId(KAKAO_REST_API_KEY, OTHER_PRODUCT_KAKAO)
+      if (!clientId) return res.status(500).json({ error: '카카오 로그인이 아직 설정되지 않았습니다. 영재 사주운 전용 Kakao 앱이 필요합니다.' })
       const clientSecret = secretValue(KAKAO_CLIENT_SECRET)
       const params = new URLSearchParams({
         grant_type: 'authorization_code',
@@ -181,10 +190,10 @@ app.post('/api/social-auth', async (req, res) => {
       email = me.kakao_account?.email || undefined
       photoURL = me.kakao_account?.profile?.profile_image_url || undefined
     } else {
-      const clientId = secretValue(NAVER_CLIENT_ID)
+      const clientId = sajuClientId(NAVER_CLIENT_ID, OTHER_PRODUCT_NAVER)
       const clientSecret = secretValue(NAVER_CLIENT_SECRET)
       if (!clientId || !clientSecret) {
-        return res.status(500).json({ error: '네이버 로그인이 아직 설정되지 않았습니다.' })
+        return res.status(500).json({ error: '네이버 로그인이 아직 설정되지 않았습니다. 영재 사주운 전용 Naver 앱이 필요합니다.' })
       }
       const params = new URLSearchParams({
         grant_type: 'authorization_code',

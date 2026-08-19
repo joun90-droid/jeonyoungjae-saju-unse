@@ -95,7 +95,7 @@ export function render() {
         <div class="login-social">
           ${kakaoConfigured() ? `<button type="button" class="btn-kakao" data-kakao>카카오로 계속하기</button>` : ''}
           ${NAVER_CLIENT_ID ? `<button type="button" class="btn-naver" data-naver>네이버로 계속하기</button>` : ''}
-          ${!kakaoConfigured() && !NAVER_CLIENT_ID ? `<p class="login-save-hint">소셜 로그인은 키를 설정한 뒤 사용할 수 있습니다. 이메일 가입으로 시작해 주세요.</p>` : ''}
+          ${!kakaoConfigured() && !NAVER_CLIENT_ID ? `<p class="login-save-hint">카카오·네이버는 영재 사주운 전용 앱을 연결한 뒤 열립니다. 지금은 이메일로 가입·로그인하면 됩니다.</p>` : ''}
         </div>
         <p class="login-save-hint">처음이면 이메일 가입. 카카오·네이버로 쓰던 계정은 소셜로 이어 주세요.</p>
         <p class="login-status" data-login-status hidden></p>

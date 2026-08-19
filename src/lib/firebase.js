@@ -25,6 +25,17 @@ export function getFirebaseAuth() {
 }
 
 export const SITE_ORIGIN = 'https://jeonyoungjae-saju-unse.web.app'
-export const KAKAO_REST_API_KEY = env.VITE_KAKAO_REST_API_KEY || ''
-export const NAVER_CLIENT_ID = env.VITE_NAVER_CLIENT_ID || ''
+
+// 기기끼리 직송(SyncPulse) 앱 키. 사주 동의 화면에 그 서비스명이 뜨므로 쓰지 않습니다.
+const OTHER_PRODUCT_KAKAO = 'a306f0ec0377e4d6c21746eed1c59af2'
+const OTHER_PRODUCT_NAVER = 'dQGR7vaNyM47CAXcoDzt'
+
+function ownClientKey(value, blocked) {
+  const key = String(value || '').trim()
+  if (!key || key === blocked) return ''
+  return key
+}
+
+export const KAKAO_REST_API_KEY = ownClientKey(env.VITE_KAKAO_REST_API_KEY, OTHER_PRODUCT_KAKAO)
+export const NAVER_CLIENT_ID = ownClientKey(env.VITE_NAVER_CLIENT_ID, OTHER_PRODUCT_NAVER)
 export const TOSS_CLIENT_KEY = env.VITE_TOSS_CLIENT_KEY || ''
