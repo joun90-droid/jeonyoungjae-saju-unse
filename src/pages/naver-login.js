@@ -1,5 +1,5 @@
 import { signInWithCustomToken, setPersistence, browserLocalPersistence } from 'firebase/auth'
-import { getCurrentUser, goSajuHomeAfterLogin, postJson, signOut } from '../lib/auth.js'
+import { getCurrentUser, goSajuHomeAfterLogin, postJson, setProviderHint, signOut } from '../lib/auth.js'
 import { getFirebaseAuth, NAVER_CLIENT_ID } from '../lib/firebase.js'
 
 const STATE_KEY = 'saju_naver_oauth_state'
@@ -39,6 +39,7 @@ export async function exchangeNaverCode(code, state) {
     redirectUri: naverRedirectUri(),
   })
   await setPersistence(getFirebaseAuth(), browserLocalPersistence)
+  setProviderHint('naver')
   const cred = await signInWithCustomToken(getFirebaseAuth(), customToken)
   try {
     const { saveProfile } = await import('../lib/auth.js')

@@ -1,5 +1,5 @@
 import { signInWithCustomToken, setPersistence, browserLocalPersistence } from 'firebase/auth'
-import { getCurrentUser, goSajuHomeAfterLogin, postJson, signOut } from '../lib/auth.js'
+import { getCurrentUser, goSajuHomeAfterLogin, postJson, setProviderHint, signOut } from '../lib/auth.js'
 import { getFirebaseAuth, KAKAO_REST_API_KEY } from '../lib/firebase.js'
 
 const STATE_KEY = 'saju_kakao_oauth_state'
@@ -41,6 +41,7 @@ export async function exchangeKakaoCode(code) {
     redirectUri: kakaoRedirectUri(),
   })
   await setPersistence(getFirebaseAuth(), browserLocalPersistence)
+  setProviderHint('kakao')
   const cred = await signInWithCustomToken(getFirebaseAuth(), customToken)
   try {
     const { saveProfile } = await import('../lib/auth.js')

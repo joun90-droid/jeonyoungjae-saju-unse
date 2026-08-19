@@ -6,8 +6,25 @@ const USER_KEY = 'saju-auth-user'
 const TOKEN_KEY = 'saju-auth-token'
 const LOGIN_FLAG = 'isLoggedIn'
 const GUEST_NOTICE = 'saju-guest-notice'
+// Kakao/Naver 로그인은 Firebase custom token으로 붙기 때문에 providerData에 실제
+// 소셜 제공자가 안 남습니다. 로그인 성공 직전에 여기 힌트를 남겨서 어떤 소셜로
+// 들어왔는지 UI(프로필 배지 등)에서 알 수 있게 합니다.
+const PROVIDER_HINT_KEY = 'saju-auth-provider-hint'
 
 const listeners = new Set()
+
+export function setProviderHint(provider) {
+  try {
+    if (provider) localStorage.setItem(PROVIDER_HINT_KEY, provider)
+    else localStorage.removeItem(PROVIDER_HINT_KEY)
+  } catch { /* ignore */ }
+}
+
+function resolveProvider(user, fallback) {
+  let hint = ''
+  try { hint = localStorage.getItem(PROVIDER_HINT_KEY) || '' } catch { /* ignore */ }
+  return hint || user.providerData?.[0]?.providerId || fallback
+}
 
 function cacheUser(user) {
   if (!user) {
@@ -18,9 +35,9 @@ function cacheUser(user) {
   const profile = {
     uid: user.uid,
     email: user.email || '',
-    name: user.displayName || user.email || '사용자',
+    name: user.displayName || user.email || '내 계정',
     photoURL: user.photoURL || '',
-    provider: user.providerData?.[0]?.providerId || 'firebase',
+    provider: resolveProvider(user, 'firebase'),
   }
   localStorage.setItem(USER_KEY, JSON.stringify(profile))
   localStorage.setItem(LOGIN_FLAG, 'true')
@@ -185,6 +202,7 @@ export async function initAuth() {
 export async function signOut() {
   await firebaseSignOut(getFirebaseAuth())
   cacheUser(null)
+  setProviderHint('')
   try { localStorage.setItem(LOGIN_FLAG, 'false') } catch { /* ignore */ }
   emit(null)
 }
@@ -244,6 +262,6 @@ export async function saveProfile(user = getFirebaseAuth().currentUser) {
     email: user.email || '',
     name: user.displayName || user.email || '',
     photoURL: user.photoURL || '',
-    provider: user.providerData?.[0]?.providerId || 'password',
+    provider: resolveProvider(user, 'password'),
   }, { auth: true })
 }

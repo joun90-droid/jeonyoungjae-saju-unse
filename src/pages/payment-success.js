@@ -1,3 +1,4 @@
+import { waitForUser } from '../lib/auth.js'
 import { applySubscription } from '../services/subscription.js'
 import { crumbs, pageTemplate } from './layout.js'
 import { verifyPayment } from './subscribe-monthly.js'
@@ -18,7 +19,7 @@ export function render() {
   })
 }
 
-export function bind(root) {
+export async function bind(root) {
   const el = root.querySelector('[data-pay-result]')
   const q = new URLSearchParams(location.search)
   const paymentKey = q.get('paymentKey')
@@ -34,17 +35,20 @@ export function bind(root) {
     return
   }
 
-  verifyPayment({ paymentKey, orderId, amount, plan })
-    .then((data) => {
-      applySubscription(data.plan, { startedAt: data.startedAt, endsAt: data.endsAt })
-      if (el) {
-        el.innerHTML = `결제가 완료되었습니다. 프리미엄이 활성화됐습니다. <a href="/">홈으로</a> · <a href="/pricing">구독 상태</a>`
-      }
-    })
-    .catch((err) => {
-      if (el) {
-        el.classList.add('is-error')
-        el.innerHTML = `${err.message || '결제 확인에 실패했습니다.'} <a href="/pricing">다시 시도</a>`
-      }
-    })
+  // Toss에서 돌아온 직후엔 Firebase 로그인 세션이 아직 브라우저에 복원되기 전일 수 있어서,
+  // currentUser가 정해질 때까지 기다린 뒤에 인증이 필요한 승인 요청을 보냅니다.
+  await waitForUser()
+
+  try {
+    const data = await verifyPayment({ paymentKey, orderId, amount, plan })
+    applySubscription(data.plan, { startedAt: data.startedAt, endsAt: data.endsAt })
+    if (el) {
+      el.innerHTML = `결제가 완료되었습니다. 프리미엄이 활성화됐습니다. <a href="/">홈으로</a> · <a href="/pricing">구독 상태</a>`
+    }
+  } catch (err) {
+    if (el) {
+      el.classList.add('is-error')
+      el.innerHTML = `${err.message || '결제 확인에 실패했습니다.'} <a href="/pricing">다시 시도</a>`
+    }
+  }
 }
