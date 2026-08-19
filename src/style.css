@@ -790,48 +790,134 @@ textarea { resize: vertical; min-height: 120px; line-height: 1.5; }
 }
 .auth-dropdown p { margin: 0 0 6px; font-size: 0.8rem; }
 
-.operator-page { margin-bottom: 24px; }
-.operator-hero {
-  padding: 22px 20px;
-  border-radius: 20px;
-  border: 1px solid rgba(196, 165, 253, 0.35);
-  background: rgba(12, 10, 20, 0.9);
-  box-shadow: 0 0 40px -12px rgba(124, 58, 237, 0.45);
+.operator-page {
+  --text-primary: #f2ebe3;
+  --text-secondary: #9c9388;
+  --text-faint: #6f6860;
+  --accent-warm: #c9b08a;
+  --surface-tertiary: #26221e;
+  padding: 7px 3px 48px;
+  color: var(--text-primary);
 }
-.operator-hero h1 {
-  margin: 8px 0 10px;
-  font-size: 1.7rem;
+.operator-page .path-trail {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  margin: 0 0 38px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+}
+.operator-page .path-trail a {
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+.operator-page .path-trail a:hover { color: var(--text-primary); }
+.operator-page .path-gap { color: var(--text-faint); }
+
+.display-kicker {
+  margin: 0 0 13px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  color: var(--accent-warm);
+}
+.display-title {
+  margin: 0;
+  font-family: "Noto Serif KR", "Source Han Serif K", serif;
+  font-size: clamp(28px, 7.2vw, 41px);
+  font-weight: 600;
+  line-height: 1.28;
+  letter-spacing: -0.048em;
+}
+.display-lead {
+  margin: 18px 0 0;
+  max-width: 34em;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.78;
+  letter-spacing: -0.018em;
+  color: var(--text-secondary);
+}
+
+.longform {
+  margin-top: 42px;
+  max-width: 36em;
+}
+.longform p {
+  margin: 0 0 22px;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.92;
+  letter-spacing: -0.016em;
+  color: #e7dfd4;
+}
+.longform p:last-child { margin-bottom: 0; }
+
+.sign-off {
+  margin: 46px 0 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: -0.012em;
+  color: var(--text-faint);
+}
+.sign-off span {
+  display: block;
+  margin-bottom: 3px;
+  font-family: "Noto Serif KR", serif;
+  font-size: 17px;
+  font-weight: 600;
   letter-spacing: -0.03em;
-  line-height: 1.3;
+  color: var(--text-primary);
 }
-.operator-body { margin-top: 22px; }
-.operator-sign { color: var(--muted); }
-.operator-box {
-  margin-top: 22px;
-  padding: 14px 16px;
-  border-radius: 14px;
-  border: 1px solid var(--line);
-  background: rgba(255,255,255,0.03);
-  font-size: 0.88rem;
+
+.contact-line {
+  margin: 38px 0 0;
+  padding: 18px 19px 17px;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.8;
+  letter-spacing: -0.01em;
+  color: var(--text-secondary);
+  background: var(--surface-tertiary);
 }
-.operator-box a { color: var(--accent); font-weight: 700; }
-.operator-actions {
+.contact-line a {
+  margin-left: 11px;
+  color: var(--accent-warm);
+  font-weight: 500;
+  text-decoration: none;
+}
+.contact-line a:hover { color: var(--text-primary); }
+
+.trail-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 18px;
+  align-items: baseline;
+  gap: 7px 22px;
+  margin: 29px 0 0;
 }
-.operator-actions .btn-primary,
-.operator-actions .btn-ghost {
-  width: auto;
-  min-width: 120px;
-  margin-top: 0;
-  text-align: center;
+.trail-home,
+.trail-mail {
   text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  font-size: 14px;
+  letter-spacing: -0.02em;
 }
+.trail-home {
+  display: inline-block;
+  padding: 11px 19px 12px;
+  background: var(--accent-warm);
+  color: #1a1714;
+  font-weight: 600;
+}
+.trail-home:hover { transform: scale(1.015); }
+.trail-mail {
+  color: var(--text-secondary);
+  font-weight: 500;
+  padding: 11px 2px;
+}
+.trail-mail:hover { color: var(--text-primary); }
 
 .login-actions { display: flex; flex-direction: column; gap: 10px; }
 .btn-google, .btn-kakao, .btn-naver, .btn-block {
@@ -842,9 +928,9 @@ textarea { resize: vertical; min-height: 120px; line-height: 1.5; }
   font-weight: 800;
   cursor: pointer;
 }
-.btn-google { background: #fff; color: #1f1f1f; }
-.btn-kakao { background: #fee500; color: #191919; }
-.btn-naver { background: #03c75a; color: #fff; }
+.btn-google { background: #f4f0ea; color: #1a1714; }
+.btn-kakao { background: #fee500; color: #191600; }
+.btn-naver { background: #03c75a; color: #f4f0ea; }
 .login-status { margin: 8px 0 0; font-size: 0.85rem; color: var(--muted); }
 .login-status.is-error { color: var(--low); }
 

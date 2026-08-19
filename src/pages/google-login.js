@@ -71,7 +71,7 @@ export function render() {
         </div>
         ${uiMode === 'reset' ? `
         <form class="login-form" data-reset-form>
-          <p class="login-sub">가입한 이메일을 입력하면 재설정 메일을 보내 드립니다.</p>
+          <p class="login-sub">가입한 메일로 재설정 안내를 보냅니다.</p>
           <input class="login-input" id="loginEmail" name="email" type="email" autocomplete="email" required placeholder="이메일" value="${escapeAttr(email)}">
           <button type="submit" class="login-submit" data-reset-submit>재설정 메일 보내기</button>
         </form>
@@ -81,25 +81,25 @@ export function render() {
           <input class="login-input" id="loginEmail" name="email" type="email" autocomplete="email" required placeholder="이메일" value="${escapeAttr(email)}">
           <div class="login-pw-wrap">
             <input class="login-input" id="loginPassword" name="password" type="password" autocomplete="${uiMode === 'signup' ? 'new-password' : 'current-password'}" minlength="6" required placeholder="비밀번호 (6자 이상)">
-            <button type="button" class="login-pw-toggle" data-toggle-pw="loginPassword" aria-label="비밀번호 보기">👁</button>
+            <button type="button" class="login-pw-toggle" data-toggle-pw="loginPassword" aria-label="비밀번호 보기">보기</button>
           </div>
           ${uiMode === 'signup' ? `
           <div class="login-pw-wrap">
             <input class="login-input" id="loginPassword2" name="password2" type="password" autocomplete="new-password" minlength="6" required placeholder="비밀번호 확인">
-            <button type="button" class="login-pw-toggle" data-toggle-pw="loginPassword2" aria-label="비밀번호 보기">👁</button>
+            <button type="button" class="login-pw-toggle" data-toggle-pw="loginPassword2" aria-label="비밀번호 보기">보기</button>
           </div>` : ''}
-          <button type="submit" class="login-submit" data-email-submit>${uiMode === 'signup' ? '가입하기' : '이메일로 로그인'}</button>
+          <button type="submit" class="login-submit" data-email-submit>${uiMode === 'signup' ? '가입하기' : '로그인'}</button>
         </form>
         `}
-        <div class="login-or">또는 소셜</div>
+        <div class="login-or">소셜</div>
         <div class="login-social">
           ${kakaoConfigured() ? `<button type="button" class="btn-kakao" data-kakao>카카오로 계속하기</button>` : ''}
           ${NAVER_CLIENT_ID ? `<button type="button" class="btn-naver" data-naver>네이버로 계속하기</button>` : ''}
           ${!kakaoConfigured() && !NAVER_CLIENT_ID ? `<p class="login-save-hint">소셜 로그인은 키를 설정한 뒤 사용할 수 있습니다. 이메일 가입으로 시작해 주세요.</p>` : ''}
         </div>
-        <p class="login-save-hint">처음 쓰는 이메일이면 「이메일 가입」 탭에서 가입하세요. 카카오·네이버로 쓰던 계정이면 아래 소셜 버튼을 이용해 주세요.</p>
+        <p class="login-save-hint">처음이면 이메일 가입. 카카오·네이버로 쓰던 계정은 소셜로 이어 주세요.</p>
         <p class="login-status" data-login-status hidden></p>
-        <button type="button" class="continue-without-login" data-guest-continue>닫고 운세 보러 가기</button>
+        <button type="button" class="continue-without-login" data-guest-continue>닫고 운세 보기</button>
         <div class="login-legal">
           <a href="/privacy-policy">개인정보</a>
           <a href="/terms-of-service">약관</a>
@@ -156,7 +156,7 @@ export function bindLoginButtons(root) {
       if (!input) return
       const show = input.type === 'password'
       input.type = show ? 'text' : 'password'
-      btn.textContent = show ? '🙈' : '👁'
+      btn.textContent = show ? '숨김' : '보기'
       btn.setAttribute('aria-label', show ? '비밀번호 숨기기' : '비밀번호 보기')
     })
   })
