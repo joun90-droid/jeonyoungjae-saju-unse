@@ -112,19 +112,23 @@ function init() {
 
 
 
-  document.querySelectorAll('.seg-btn[data-detail]').forEach((btn) => {
+  const DETAIL_LEVELS = ['mild', 'medium', 'spicy']
+  const detailSlider = document.getElementById('detailSlider')
+  const detailTicks = Array.from(document.querySelectorAll('.depth-tick'))
 
-    btn.addEventListener('click', () => {
+  function setDetailLevel(idx, { silent = false } = {}) {
+    idx = Math.max(0, Math.min(2, idx))
+    detailLevel = DETAIL_LEVELS[idx]
+    if (detailSlider) {
+      detailSlider.value = String(idx)
+      detailSlider.style.setProperty('--fill', `${(idx / 2) * 100}%`)
+    }
+    detailTicks.forEach((t, i) => t.classList.toggle('active', i === idx))
+    if (!silent && report) renderPanel(panel)
+  }
 
-      detailLevel = btn.dataset.detail
-
-      document.querySelectorAll('.seg-btn[data-detail]').forEach((b) => b.classList.toggle('active', b === btn))
-
-      if (report) renderPanel(panel)
-
-    })
-
-  })
+  detailSlider?.addEventListener('input', () => setDetailLevel(Number(detailSlider.value)))
+  detailTicks.forEach((t, i) => t.addEventListener('click', () => setDetailLevel(i)))
 
 
 
@@ -563,7 +567,7 @@ function renderPillars(pillarCard) {
 
     : ''
 
-  const detailBadge = `<span class="detail-badge">${detailLevel === 'spicy' ? '매운맛' : detailLevel === 'medium' ? '중간맛' : '순한맛'}</span>`
+  const detailBadge = `<span class="detail-badge">${detailLevel === 'spicy' ? '완벽' : detailLevel === 'medium' ? '통찰' : '한눈에'}</span>`
 
 
 

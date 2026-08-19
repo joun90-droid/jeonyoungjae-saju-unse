@@ -93,12 +93,12 @@
           <h1>사주로 보는<br><span>재물 · 연애 · 투자 · 직업 · 시기</span></h1>
           <p class="hero-lead">생년월일시로 사주를 계산하고, 과거·현재·미래 흐름과 재물운·연애운·투자·직업 추천을 정리합니다.</p>
           <div class="tool-grid">
-            <a href="/daily-fortune">오늘의 운세</a>
-            <a href="/psychology-test">심리테스트</a>
-            <a href="/compatibility">궁합</a>
-            <a href="/chart">만세력</a>
-            <a href="/tarot">타로</a>
-            <a href="/mbti">MBTI</a>
+            <a href="/daily-fortune"><svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg><span>오늘의 운세</span></a>
+            <a href="/psychology-test"><svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3 11.2c.6.4 1 1.1 1 1.8h4c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3Z"/></svg><span>심리테스트</span></a>
+            <a href="/compatibility"><svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.35-9.5-8.5C.8 8.5 2 5 5.5 5c2 0 3.5 1.2 4.5 2.7C11 6.2 12.5 5 14.5 5 18 5 19.2 8.5 17.5 11.5 15 15.65 12 20 12 20Z"/></svg><span>궁합</span></a>
+            <a href="/chart"><svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="16" rx="2"/><path d="M3.5 9.5h17M8 3v3M16 3v3"/></svg><span>만세력</span></a>
+            <a href="/tarot"><svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M12 8.5l1 2 2.2.3-1.6 1.6.4 2.2-2-1.1-2 1.1.4-2.2-1.6-1.6L11 10.5l1-2Z"/></svg><span>타로</span></a>
+            <a href="/mbti"><svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.2"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.2"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.2"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.2"/></svg><span>MBTI</span></a>
           </div>
         </section>
 
@@ -128,12 +128,15 @@
           </div>
           <div class="row detail-row">
             <span class="label">해석 깊이</span>
-            <div class="seg seg-detail">
-              <button type="button" class="seg-btn" data-detail="mild">순한맛</button>
-              <button type="button" class="seg-btn active" data-detail="medium">중간맛</button>
-              <button type="button" class="seg-btn" data-detail="spicy">매운맛</button>
+            <div class="depth-slider">
+              <input type="range" id="detailSlider" class="depth-range" min="0" max="2" step="1" value="1" style="--fill: 50%" aria-label="해석 깊이">
+              <div class="depth-ticks">
+                <span class="depth-tick" data-idx="0">한눈에</span>
+                <span class="depth-tick active" data-idx="1">통찰</span>
+                <span class="depth-tick" data-idx="2">완벽</span>
+              </div>
             </div>
-            <p class="detail-hint">순한맛=핵심+짧은 상세 · 중간맛=장문 · 매운맛=최장문·정밀</p>
+            <p class="detail-hint">한눈에=핵심+짧은 상세 · 통찰=장문 · 완벽=최장문·정밀</p>
           </div>
           <div class="row gender-row">
             <span class="label">성별</span>
@@ -176,11 +179,11 @@
         <div id="results" class="results" hidden>
           <section class="card pillar-card" id="pillarCard"></section>
           <nav class="tabs" id="tabs" role="tablist">
-            <button type="button" class="tab active" data-tab="timeline">시기별</button>
-            <button type="button" class="tab" data-tab="wealth">재물운</button>
-            <button type="button" class="tab" data-tab="love">연애운</button>
-            <button type="button" class="tab" data-tab="invest">투자·손익</button>
-            <button type="button" class="tab" data-tab="career">직업·적성</button>
+            <button type="button" class="tab active" data-tab="timeline"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span>시기별</span></button>
+            <button type="button" class="tab" data-tab="wealth"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 9 8 3.5h8L20.5 9 12 20.5 3.5 9Z"/><path d="M3.5 9h17"/></svg><span>재물운</span></button>
+            <button type="button" class="tab" data-tab="love"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.35-9.5-8.5C.8 8.5 2 5 5.5 5c2 0 3.5 1.2 4.5 2.7C11 6.2 12.5 5 14.5 5 18 5 19.2 8.5 17.5 11.5 15 15.65 12 20 12 20Z"/></svg><span>연애운</span></button>
+            <button type="button" class="tab" data-tab="invest"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 17 9 11l4 3 7.5-8.5"/><path d="M15.5 5.5H20.5V10.5"/></svg><span>투자·손익</span></button>
+            <button type="button" class="tab" data-tab="career"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/></svg><span>직업·적성</span></button>
           </nav>
           <div id="panel" class="panels"></div>
         </div>
@@ -212,6 +215,7 @@
         <a href="/contact">연락처</a>
       </nav>
       <p>본 서비스는 오락·참고용이며, 투자·의료·법률 조언이 아닙니다.</p>
+      <p class="footer-biz">와이제이인터내셔널(대표: 전영재) · 사업자등록번호 569-10-02302 · 경기도 파주시 해올로 20 (다율동, 해오름마을 12단지) 1206-1404 · 010-7196-5587</p>
       <p>문의: <a href="mailto:joun90@gmail.com">joun90@gmail.com</a></p>
       <p>© 영재 사주운</p>
     </footer>
