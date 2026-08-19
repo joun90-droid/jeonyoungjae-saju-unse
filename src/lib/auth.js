@@ -76,6 +76,49 @@ export function goSajuHomeAfterLogin() {
   location.replace(home)
 }
 
+export async function consumePendingSocialAuth() {
+  let raw = ''
+  try { raw = sessionStorage.getItem('saju-oauth-pending') || '' } catch { return }
+  if (!raw) return
+  try { sessionStorage.removeItem('saju-oauth-pending') } catch { /* ignore */ }
+  let data
+  try { data = JSON.parse(raw) } catch { return }
+  if (data.error || !data.code) {
+    if (data.error) {
+      try { sessionStorage.setItem('saju-oauth-error', data.error) } catch { /* ignore */ }
+    }
+    return
+  }
+  const stateKey = data.provider === 'naver' ? 'saju_naver_oauth_state' : 'saju_kakao_oauth_state'
+  let expected = ''
+  try { expected = sessionStorage.getItem(stateKey) || '' } catch { /* ignore */ }
+  try { sessionStorage.removeItem(stateKey) } catch { /* ignore */ }
+  if (expected && data.state !== expected) {
+    try { sessionStorage.setItem('saju-oauth-error', '로그인 검증에 실패했습니다. 다시 시도해 주세요.') } catch { /* ignore */ }
+    return
+  }
+  try {
+    if (data.provider === 'naver') {
+      const { exchangeNaverCode } = await import('../pages/naver-login.js')
+      await exchangeNaverCode(data.code)
+    } else {
+      const { exchangeKakaoCode } = await import('../pages/kakao-login.js')
+      await exchangeKakaoCode(data.code)
+    }
+    goSajuHomeAfterLogin()
+  } catch (err) {
+    try { sessionStorage.setItem('saju-oauth-error', err.message || '로그인에 실패했습니다.') } catch { /* ignore */ }
+    const { openLogin } = await import('../pages/google-login.js')
+    openLogin({ next: '/#birthForm' })
+    const status = document.querySelector('[data-login-status]')
+    if (status) {
+      status.hidden = false
+      status.textContent = err.message || '로그인에 실패했습니다.'
+      status.classList.add('is-error')
+    }
+  }
+}
+
 export function consumeGuestNotice() {
   try {
     if (localStorage.getItem(GUEST_NOTICE) !== '1') return false

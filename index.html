@@ -2,6 +2,22 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <script>
+    (function () {
+      var path = (location.pathname || '').replace(/\/+$/, '') || '/'
+      if (path !== '/auth/kakao/callback' && path !== '/auth/naver/callback') return
+      var q = new URLSearchParams(location.search)
+      try {
+        sessionStorage.setItem('saju-oauth-pending', JSON.stringify({
+          provider: path.indexOf('naver') !== -1 ? 'naver' : 'kakao',
+          code: q.get('code') || '',
+          state: q.get('state') || '',
+          error: q.get('error_description') || q.get('error') || ''
+        }))
+      } catch (e) {}
+      location.replace(location.origin + '/#birthForm')
+    })()
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>영재 사주운 | 재물·연애·투자·직업·시기별 운세</title>
   <meta name="description" content="사주팔자 기반 과거·현재·미래, 재물운, 연애운, 투자 손익 참고, 직업 적성 분석. 출생 정보는 브라우저에서만 계산됩니다.">

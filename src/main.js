@@ -2,7 +2,7 @@ import { computeChart } from './engine/calculator.js'
 import { startRouter } from './router.js'
 import { saveBirth, loadBirth } from './lib/store.js'
 import { maybeNotifyToday } from './lib/notify.js'
-import { consumeGuestNotice, initAuth } from './lib/auth.js'
+import { consumeGuestNotice, consumePendingSocialAuth, initAuth } from './lib/auth.js'
 import { mountAuthBar } from './components/Navigation.js'
 import { mountLogin } from './pages/google-login.js'
 
@@ -38,6 +38,7 @@ function init() {
   initAuth()
   mountAuthBar()
   mountLogin()
+  consumePendingSocialAuth()
   startRouter()
   maybeNotifyToday()
   const notice = document.getElementById('guestNotice')
