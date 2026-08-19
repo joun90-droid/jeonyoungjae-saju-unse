@@ -1,3 +1,4 @@
+import { postJson } from '../lib/auth.js'
 import { SITE } from './site.js'
 import { crumbs, pageTemplate } from './layout.js'
 
@@ -39,10 +40,10 @@ export const Contact = {
           <label>내용
             <textarea name="message" rows="7" required placeholder="오류 화면, 개선 아이디어, 협업 제안 등을 적어 주세요."></textarea>
           </label>
-          <button type="submit" class="btn-primary">이메일 앱으로 보내기</button>
-          <p class="privacy">메일 앱이 열리면 내용을 확인한 뒤 전송해 주세요. 생년월일시·주민번호 등 민감정보는 적지 마세요.</p>
+          <button type="submit" class="btn-primary" data-contact-submit>보내기</button>
+          <p class="privacy">생년월일시·주민번호 등 민감정보는 적지 마세요.</p>
         </form>
-        <p id="contactFallback" class="contact-fallback" hidden></p>
+        <p id="contactFallback" class="login-status" hidden></p>
       </section>
       <section>
         <h2>응답 시간</h2>
@@ -72,19 +73,46 @@ export function render() {
 export function bind(root) {
   const form = root.querySelector('#contactForm')
   const fallback = root.querySelector('#contactFallback')
-  form?.addEventListener('submit', (e) => {
+  const submitBtn = root.querySelector('[data-contact-submit]')
+
+  const setStatus = (msg, kind = '') => {
+    if (!fallback) return
+    fallback.hidden = !msg
+    fallback.innerHTML = msg || ''
+    fallback.classList.toggle('is-error', kind === 'error')
+    fallback.classList.toggle('is-ok', kind === 'ok')
+  }
+
+  form?.addEventListener('submit', async (e) => {
     e.preventDefault()
     const data = new FormData(form)
     const name = String(data.get('name') || '').trim()
     const email = String(data.get('email') || '').trim()
     const subject = String(data.get('subject') || '').trim()
     const message = String(data.get('message') || '').trim()
-    const body = `보낸 사람: ${name}\n회신: ${email}\n\n${message}`
-    const mailto = `mailto:${SITE.email}?subject=${encodeURIComponent(`[${SITE.name}] ${subject}`)}&body=${encodeURIComponent(body)}`
-    window.location.href = mailto
-    if (fallback) {
-      fallback.hidden = false
-      fallback.innerHTML = `메일 앱이 열리지 않으면 <a href="mailto:${SITE.email}">${SITE.email}</a>로 직접 보내 주세요.`
+    if (!name || !email || !message) {
+      setStatus('이름·이메일·내용을 모두 입력해 주세요.', 'error')
+      return
+    }
+    setStatus('')
+    if (submitBtn) {
+      submitBtn.disabled = true
+      submitBtn.textContent = '보내는 중…'
+    }
+    try {
+      await postJson('/api/contact', { name, email, subject, message })
+      setStatus('문의가 접수됐습니다. 빠르게 회신드릴게요.', 'ok')
+      form.reset()
+    } catch (err) {
+      setStatus(
+        `${err.message || '전송에 실패했습니다.'} 대신 <a href="mailto:${SITE.email}">${SITE.email}</a>로 보내 주세요.`,
+        'error',
+      )
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false
+        submitBtn.textContent = '보내기'
+      }
     }
   })
 }

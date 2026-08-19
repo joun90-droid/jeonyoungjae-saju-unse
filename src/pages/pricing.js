@@ -3,6 +3,7 @@ import { getSubscriptionStatus, statusLabel } from '../services/subscription.js'
 import { crumbs, pageTemplate } from './layout.js'
 import { handleLifetimePayment, handleMonthlyPayment } from './subscribe-monthly.js'
 import { openLogin } from './google-login.js'
+import { SITE } from './site.js'
 
 export const meta = {
   path: '/pricing',
@@ -21,7 +22,7 @@ export function render() {
     lead: '무료로 기본 분석을 보고, 상세 해석·장기 만세력은 프리미엄에서 엽니다. 결제는 Toss Payments 테스트/실결제 키로 처리됩니다.',
     crumbsHtml: crumbs([{ href: '/', label: '홈' }, { label: '프리미엄' }]),
     body: `
-      <p class="privacy">현재: <strong>${user ? user.name : '미로그인'}</strong> · ${statusLabel(status)}</p>
+      <p class="privacy">현재: <strong>${user ? user.name : '미로그인'}</strong> · ${statusLabel(status)}${user ? ' · <a href="/account">구독 관리</a>' : ''}</p>
       <div class="price-grid">
         <article class="price-card">
           <p class="eyebrow">FREE</p>
@@ -66,6 +67,11 @@ export function render() {
         </article>
       </div>
       <p class="login-status is-error" data-pay-status hidden></p>
+      <aside class="info-callout">
+        <p><strong>서비스 제공기간</strong>: 월간은 결제일로부터 30일, 평생은 기간 제한 없이 즉시 활성화됩니다. 자동 재결제는 없습니다.</p>
+        <p><strong>취소·환불</strong>: 결제 후 7일 이내 미이용 시 전액 환불되며, 이용 개시 후에는 관련 법률에 따라 청약철회가 제한될 수 있습니다. 월간 구독은 <a href="/account">구독 관리</a>에서 언제든 취소할 수 있습니다. 자세한 조건은 <a href="/terms-of-service">이용약관</a>을 확인해 주세요.</p>
+        <p>문의·이의신청: <a href="mailto:${SITE.email}">${SITE.email}</a> · ${SITE.phone}</p>
+      </aside>
     `,
   })
 }

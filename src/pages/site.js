@@ -2,6 +2,10 @@ export const SITE = {
   name: '영재 사주운',
   operator: '전영재',
   email: 'joun90@gmail.com',
+  phone: '010-7196-5587',
+  businessName: '와이제이인터내셔널',
+  businessRegNo: '569-10-02302',
+  address: '경기도 파주시 해올로 20 (다율동, 해오름마을 12단지) 1206-1404',
   origin: 'https://jeonyoungjae-saju-unse.web.app',
   effectiveDate: '2026년 8월 18일',
 }

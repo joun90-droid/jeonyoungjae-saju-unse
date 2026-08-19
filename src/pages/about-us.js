@@ -37,6 +37,10 @@ export function render() {
         <a href="/contact">문의 페이지</a>
         <a href="mailto:${SITE.email}">${SITE.email}</a>
       </p>
+      <p class="contact-line">
+        사업자 정보
+        <span class="biz-detail">${SITE.businessName} (대표: ${SITE.operator}) · 사업자등록번호 ${SITE.businessRegNo} · ${SITE.address} · ${SITE.phone}</span>
+      </p>
       <p class="trail-links">
         <a class="trail-home" href="/">홈으로</a>
         <a class="trail-mail" href="/contact">문의하기</a>
