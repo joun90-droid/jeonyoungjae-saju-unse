@@ -20,13 +20,14 @@ export async function signInWithNaver() {
   }
   const state = randomState()
   sessionStorage.setItem(STATE_KEY, state)
+  const redirectUri = naverRedirectUri()
   const params = new URLSearchParams({
-    client_id: NAVER_CLIENT_ID,
-    redirect_uri: naverRedirectUri(),
     response_type: 'code',
+    client_id: NAVER_CLIENT_ID,
+    redirect_uri: redirectUri,
     state,
   })
-  location.assign(`https://nid.naver.com/oauth2.0/authorize?${params}`)
+  location.assign(`https://nid.naver.com/oauth2.0/authorize?${params.toString()}`)
   return new Promise(() => {})
 }
 
