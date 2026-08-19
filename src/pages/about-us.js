@@ -1,53 +1,40 @@
 import { SITE } from './site.js'
-import { crumbs, pageTemplate } from './layout.js'
 
 export const AboutUs = {
-  title: '소개',
+  title: '운영자 소개',
   path: '/about-us',
-  content: `
-    <div class="policy-page">
-      <section>
-        <h2>이 앱은 무엇인가요?</h2>
-        <p>영재 사주운은 동양의 오래된 사주 철학을 현대적으로 해석한 웹앱입니다. 생년월일을 입력하면 천간지지, 오행, 대운 등을 기반으로 현재의 운세를 분석해 드립니다.</p>
-      </section>
-      <section>
-        <h2>기술적 특징</h2>
-        <p>본 앱은 다음과 같은 기술로 구현되었습니다:</p>
-        <ul>
-          <li>Vite + Vanilla JS (빠른 로딩)</li>
-          <li>브라우저 기반 사주 계산 (출생 정보는 서버로 보내지 않음)</li>
-          <li>선택적 Google/Kakao 로그인 (구독·결제용)</li>
-          <li>Firebase Hosting · Authentication</li>
-          <li>오픈소스 라이브러리 활용</li>
-        </ul>
-      </section>
-      <section>
-        <h2>개발자 소개</h2>
-        <p><strong>영재 (Jeon Young Jae)</strong></p>
-        <p>풀스택 개발자로서 다양한 웹 애플리케이션을 개발해 왔습니다. 동양 철학과 기술의 결합에 관심이 있으며, 사용자 경험을 중시하는 개발을 지향합니다.</p>
-        <p>📧 연락처: <a href="mailto:${SITE.email}">${SITE.email}</a></p>
-      </section>
-      <section>
-        <h2>문의 및 피드백</h2>
-        <p>앱에 대한 의견이나 개선사항을 제안하고 싶으시다면 <a href="/contact">연락처</a> 또는 위의 이메일로 연락해 주세요. 성실하게 답변하겠습니다.</p>
-      </section>
-      <p class="page-date">© 2026 영재 사주운. All rights reserved.</p>
-    </div>
-  `,
 }
 
 export const meta = {
   path: AboutUs.path,
-  title: `${AboutUs.title} | 영재 사주운`,
-  description: '영재 사주운 소개. 브라우저에서 사주를 계산하는 웹앱과 개발자 전영재 연락처를 안내합니다.',
+  title: '운영자 소개 | 영재 사주운',
+  description: '영재 사주운 운영자 전영재 소개. 사주팔자와 오행으로 오늘의 흐름을 읽고, 출생 정보는 브라우저에서만 계산합니다.',
 }
 
 export function render() {
-  return pageTemplate({
-    kicker: 'About',
-    title: '영재 사주운 소개',
-    lead: '생년월일시로 사주팔자와 운세 흐름을 정리하는 웹 서비스입니다.',
-    crumbsHtml: crumbs([{ href: '/', label: '홈' }, { label: AboutUs.title }]),
-    body: AboutUs.content,
-  })
+  return `
+    <article class="operator-page">
+      <nav class="crumbs" aria-label="현재 위치">
+        <a href="/">홈</a><span class="sep" aria-hidden="true">›</span><span class="current">운영자 소개</span>
+      </nav>
+      <header class="operator-hero">
+        <p class="eyebrow">About · 운영자 소개</p>
+        <h1>사주팔자로 오늘의 흐름을 읽습니다</h1>
+        <p class="page-lead">태어난 순간의 천간·지지를 지도처럼 펼쳐, 지금 서 있는 자리와 다가올 시기를 차분히 풀어 드립니다.</p>
+      </header>
+      <div class="operator-body prose">
+        <p>안녕하세요. <strong>영재 사주운</strong>을 운영하는 <strong>${SITE.operator}</strong>입니다.</p>
+        <p>사주는 점괘로 인생을 확정하는 도구가 아니라, <strong>오행의 균형과 대운의 방향</strong>을 읽는 오래된 언어입니다. 재물·연애·직업·타이밍을 한 번에 단정하지 않고, 지금 흐름이 어디에 무게가 실리는지부터 보여 드리려 합니다.</p>
+        <p>만세력·일진·궁합은 브라우저에서 바로 계산합니다. <strong>생년월일시는 서버로 올리지 않습니다.</strong> 로그인과 구독은 기록을 남기고 싶을 때만 쓰면 되고, 게스트로도 기본 운세는 볼 수 있습니다.</p>
+        <p>미신으로 겁을 주거나, 비싼 상담을 떠미는 서비스는 만들지 않겠습니다. 궁금한 띠·오행·궁합은 가이드에 풀어 두었고, 더 깊은 해석이 필요하면 문의로 남겨 주세요.</p>
+        <p class="operator-sign">— ${SITE.operator}<br>영재 사주운 · 운영자</p>
+      </div>
+      <aside class="operator-box">
+        문의·제안: <a href="/contact">문의하기 페이지</a> · <a href="mailto:${SITE.email}">${SITE.email}</a>
+      </aside>
+      <div class="operator-actions">
+        <a class="btn-primary" href="/">홈으로</a>
+        <a class="btn-ghost" href="/contact">문의하기</a>
+      </div>
+    </article>`
 }

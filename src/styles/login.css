@@ -74,9 +74,9 @@ body.is-login .legal-nav {
   max-width: 480px;
   padding: 40px;
   border-radius: 16px;
-  background: var(--login-card);
-  border: 1px solid var(--login-border);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  background: #0f111a;
+  border: 1px solid rgba(0, 242, 254, 0.28);
+  box-shadow: 0 0 40px -10px rgba(0, 242, 254, 0.4), 0 20px 60px rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(12px);
 }
 
@@ -246,6 +246,77 @@ body.is-login .legal-nav {
 }
 .login-status.is-error { color: #fb7185; }
 .login-status.is-ok { color: #34d399; }
+
+.login-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid var(--login-border);
+  background: rgba(0,0,0,0.28);
+}
+.login-tabs button {
+  flex: 1;
+  padding: 8px 4px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--login-muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.login-tabs button.is-on {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+.login-pw-wrap { position: relative; }
+.login-pw-wrap .login-input { padding-right: 44px; }
+.login-pw-toggle {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--login-muted);
+  cursor: pointer;
+  font-size: 16px;
+}
+.login-pw-toggle:hover { color: #fff; background: rgba(255,255,255,0.06); }
+.login-or {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 0 12px;
+  color: var(--login-muted);
+  font-size: 12px;
+}
+.login-or::before,
+.login-or::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--login-border);
+}
+.login-social { display: flex; flex-direction: column; gap: 8px; }
+.login-submit {
+  width: 100%;
+  height: 44px;
+  border: 0;
+  border-radius: 12px;
+  background: #00f2fe;
+  color: #0f0f0f;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.login-submit:hover { filter: brightness(1.08); }
+.login-submit:disabled { opacity: 0.6; }
 
 .login-legal {
   display: flex;

@@ -11,6 +11,7 @@ export const NAV = [
   { href: '/daily-fortune', label: '오늘' },
   { href: '/compatibility', label: '궁합' },
   { href: '/guide', label: '가이드' },
+  { href: '/about-us', label: '운영자 소개' },
   { href: '/pricing', label: '요금' },
 ]
 
@@ -34,6 +35,6 @@ export const GUIDE_LINKS = [
 export const FOOTER_POLICY = [
   { href: '/privacy-policy', label: '개인정보처리방침' },
   { href: '/terms-of-service', label: '이용약관' },
-  { href: '/about-us', label: '소개' },
+  { href: '/about-us', label: '운영자 소개' },
   { href: '/contact', label: '연락처' },
 ]
