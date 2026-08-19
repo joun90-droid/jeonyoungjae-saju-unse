@@ -31,10 +31,11 @@ export async function signInWithNaver() {
   return new Promise(() => {})
 }
 
-export async function exchangeNaverCode(code) {
+export async function exchangeNaverCode(code, state) {
   const { customToken } = await postJson('/api/social-auth', {
     provider: 'naver',
     code,
+    state: state || '',
     redirectUri: naverRedirectUri(),
   })
   await setPersistence(getFirebaseAuth(), browserLocalPersistence)
@@ -87,7 +88,7 @@ export function bind() {
     goSajuHomeAfterLogin()
     return
   }
-  exchangeNaverCode(code)
+  exchangeNaverCode(code, state)
     .then(() => goSajuHomeAfterLogin())
     .catch((err) => {
       try { sessionStorage.setItem('saju-oauth-error', err.message || '네이버 로그인에 실패했습니다.') } catch { /* ignore */ }

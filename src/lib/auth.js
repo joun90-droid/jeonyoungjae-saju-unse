@@ -111,7 +111,7 @@ export async function consumePendingSocialAuth() {
   try {
     if (data.provider === 'naver') {
       const { exchangeNaverCode } = await import('../pages/naver-login.js')
-      await exchangeNaverCode(data.code)
+      await exchangeNaverCode(data.code, data.state)
     } else {
       const { exchangeKakaoCode } = await import('../pages/kakao-login.js')
       await exchangeKakaoCode(data.code)

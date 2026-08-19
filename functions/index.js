@@ -142,7 +142,7 @@ function isSajuRedirect(redirectUri) {
 }
 
 app.post('/api/social-auth', async (req, res) => {
-  const { provider, code, redirectUri } = req.body || {}
+  const { provider, code, redirectUri, state } = req.body || {}
   if ((provider !== 'kakao' && provider !== 'naver') || !code || !redirectUri) {
     return res.status(400).json({ error: '잘못된 요청입니다.' })
   }
@@ -205,10 +205,11 @@ app.post('/api/social-auth', async (req, res) => {
         grant_type: 'authorization_code',
         client_id: clientId,
         client_secret: clientSecret,
-        redirect_uri: redirectUri,
-        code,
+        redirect_uri: String(redirectUri || '').trim(),
+        code: String(code || '').trim(),
+        state: String(state || '').trim(),
       })
-      const tokenRes = await fetch(`https://nid.naver.com/oauth2.0/token?${params}`)
+      const tokenRes = await fetch(`https://nid.naver.com/oauth2.0/token?${params.toString()}`)
       const tokenJson = await tokenRes.json()
       if (!tokenRes.ok || tokenJson.error || !tokenJson.access_token) {
         logger.error('Naver 토큰 교환 실패', tokenJson)
