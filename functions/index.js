@@ -212,7 +212,10 @@ app.post('/api/social-auth', async (req, res) => {
       const tokenJson = await tokenRes.json()
       if (!tokenRes.ok || tokenJson.error || !tokenJson.access_token) {
         logger.error('Naver 토큰 교환 실패', tokenJson)
-        return res.status(401).json({ error: '네이버 인증에 실패했습니다. Callback URL을 Naver Developers에 등록했는지 확인해 주세요.' })
+        const naverErr = String(tokenJson.error_description || tokenJson.error || '')
+        return res.status(401).json({
+          error: naverErr ? `네이버 인증 실패: ${naverErr}` : '네이버 인증에 실패했습니다. Callback URL을 Naver Developers에 등록했는지 확인해 주세요.',
+        })
       }
       const meRes = await fetch('https://openapi.naver.com/v1/nid/me', {
         headers: { Authorization: `Bearer ${tokenJson.access_token}` },
