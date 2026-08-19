@@ -1,7 +1,6 @@
 import { signInWithCustomToken } from 'firebase/auth'
-import { getCurrentUser, postJson, signOut } from '../lib/auth.js'
+import { getCurrentUser, goSajuHomeAfterLogin, postJson, signOut } from '../lib/auth.js'
 import { getFirebaseAuth, KAKAO_REST_API_KEY } from '../lib/firebase.js'
-import { crumbs, pageTemplate } from './layout.js'
 
 const STATE_KEY = 'saju_kakao_oauth_state'
 
@@ -92,16 +91,10 @@ export const meta = {
 export function render() {
   const params = new URLSearchParams(location.search)
   const err = params.get('error_description') || params.get('error')
-  return pageTemplate({
-    kicker: 'Kakao',
-    title: 'Kakao 로그인',
-    lead: err ? '로그인을 완료하지 못했습니다.' : '로그인 처리를 마무리하는 중입니다.',
-    crumbsHtml: crumbs([{ href: '/', label: '홈' }, { href: '/login', label: '로그인' }, { label: 'Kakao' }]),
-    body: `<p class="login-status ${err ? 'is-error' : ''}" data-kakao-status>${err ? `카카오: ${err}` : '잠시만 기다려 주세요…'}</p>`,
-  })
+  return `<p class="login-status ${err ? 'is-error' : ''}" data-kakao-status>${err ? `카카오: ${err}` : '로그인되었습니다. 사주로 이동합니다…'}</p>`
 }
 
-export function bind(root) {
+export function bind() {
   const params = new URLSearchParams(location.search)
   const code = params.get('code')
   const state = params.get('state')
@@ -115,18 +108,19 @@ export function bind(root) {
       state,
       error: error || '',
     }, location.origin)
-    window.close()
+    window.setTimeout(() => window.close(), 120)
+    window.setTimeout(() => goSajuHomeAfterLogin(), 400)
     return
   }
 
-  if (error || !code) return
+  if (error || !code) {
+    goSajuHomeAfterLogin()
+    return
+  }
   exchangeKakaoCode(code)
-    .then(() => { location.replace('/') })
+    .then(() => goSajuHomeAfterLogin())
     .catch((err) => {
-      const el = root?.querySelector('[data-kakao-status]')
-      if (el) {
-        el.classList.add('is-error')
-        el.textContent = err.message || '카카오 로그인에 실패했습니다.'
-      }
+      try { sessionStorage.setItem('saju-oauth-error', err.message || '카카오 로그인에 실패했습니다.') } catch { /* ignore */ }
+      goSajuHomeAfterLogin()
     })
 }

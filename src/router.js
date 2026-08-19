@@ -158,7 +158,13 @@ function renderRoute() {
     pageView.innerHTML = ''
     updateHead(route, '/')
     updateNav('/')
-    window.scrollTo(0, 0)
+    if (location.hash === '#birthForm') {
+      requestAnimationFrame(() => {
+        document.getElementById('birthForm')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      })
+    } else {
+      window.scrollTo(0, 0)
+    }
     return
   }
 

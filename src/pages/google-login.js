@@ -7,7 +7,7 @@ import {
   signInWithEmailAndPassword,
   updateProfile,
 } from 'firebase/auth'
-import { authErrorMessage, continueWithoutLogin, getCurrentUser, saveProfile, signOut } from '../lib/auth.js'
+import { authErrorMessage, continueWithoutLogin, getCurrentUser, goSajuHomeAfterLogin, saveProfile, signOut } from '../lib/auth.js'
 import { getFirebaseAuth, NAVER_CLIENT_ID } from '../lib/firebase.js'
 import { signInWithKakao, kakaoConfigured } from './kakao-login.js'
 import { signInWithNaver } from './naver-login.js'
@@ -137,9 +137,11 @@ export function bindLoginButtons(root) {
     await saveProfile()
     const next = loginNext()
     closeLogin()
-    const here = `${location.pathname}${location.search}`
-    if (next !== '/' && next !== here) location.assign(next)
-    else if (next === '/' && location.pathname !== '/') location.assign('/')
+    if (next && next !== '/' && !next.startsWith('/#') && next !== `${location.pathname}${location.search}`) {
+      location.assign(next)
+      return
+    }
+    goSajuHomeAfterLogin()
   }
 
   root.querySelector('[data-login-close]')?.addEventListener('click', closeLogin)
@@ -267,6 +269,19 @@ export function openLogin({ signup = false, reset = false, mode = '', next = '/'
 }
 
 export function mountLogin() {
+  try {
+    const oauthErr = sessionStorage.getItem('saju-oauth-error')
+    if (oauthErr) {
+      sessionStorage.removeItem('saju-oauth-error')
+      openLogin({ next: '/#birthForm' })
+      const status = overlayEl()?.querySelector('[data-login-status]')
+      if (status) {
+        status.hidden = false
+        status.textContent = oauthErr
+        status.classList.add('is-error')
+      }
+    }
+  } catch { /* ignore */ }
   if (!overlayEl()) {
     const root = document.createElement('div')
     root.id = 'loginOverlay'

@@ -58,6 +58,24 @@ export function continueWithoutLogin() {
   if (location.pathname !== '/' || location.search) location.assign('/')
 }
 
+export function goSajuHomeAfterLogin() {
+  const notice = document.getElementById('guestNotice')
+  if (notice) notice.hidden = true
+  const overlay = document.getElementById('loginOverlay')
+  if (overlay) {
+    overlay.hidden = true
+    overlay.innerHTML = ''
+  }
+  document.body.classList.remove('is-login-open')
+  const home = `${location.origin}/#birthForm`
+  if (location.pathname === '/' || location.pathname === '') {
+    if (location.hash !== '#birthForm') history.replaceState({}, '', '/#birthForm')
+    document.getElementById('birthForm')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    return
+  }
+  location.replace(home)
+}
+
 export function consumeGuestNotice() {
   try {
     if (localStorage.getItem(GUEST_NOTICE) !== '1') return false
@@ -108,6 +126,8 @@ export async function initAuth() {
     if (user) {
       try { await user.getIdToken().then((t) => localStorage.setItem(TOKEN_KEY, t)) } catch { /* ignore */ }
       await refreshSubscriptionFromServer().catch(() => {})
+      const notice = document.getElementById('guestNotice')
+      if (notice) notice.hidden = true
     }
     emit(profile)
   })
