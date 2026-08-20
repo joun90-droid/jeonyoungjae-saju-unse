@@ -49,6 +49,9 @@ body {
   justify-content: space-between;
   gap: 16px;
   padding: 18px 24px;
+  /* 홈 화면에 추가한 iOS 전체화면 모드에서는 상태표시줄이 페이지 위에 겹쳐 뜨므로,
+     그만큼 더 밀어내려 로고가 가려지지 않게 합니다. 일반 브라우저 탭에서는 0이라 영향 없습니다. */
+  padding-top: calc(18px + env(safe-area-inset-top, 0px));
   border-bottom: 1px solid var(--line);
   background: color-mix(in srgb, var(--bg) 82%, transparent);
   backdrop-filter: blur(14px);
