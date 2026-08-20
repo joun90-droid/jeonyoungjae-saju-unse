@@ -5,8 +5,10 @@ import { openLogin } from './google-login.js'
 
 export const MONTHLY_AMOUNT = 4900
 
+// Toss orderId는 영문/숫자/-/_ 조합, 6~64자만 허용합니다. 카카오·네이버 로그인은
+// uid가 길어서(특히 네이버는 40자 안팎) 그대로 넣으면 64자를 넘길 수 있어 앞부분만 씁니다.
 export function generateOrderId(uid, plan) {
-  const safe = String(uid || 'guest').replace(/[^A-Za-z0-9_-]/g, '_')
+  const safe = String(uid || 'guest').replace(/[^A-Za-z0-9_-]/g, '_').slice(0, 32)
   return `saju_${safe}_${plan}_${Date.now()}`
 }
 

@@ -362,7 +362,8 @@ app.post('/api/toss/confirm', async (req, res) => {
     return res.status(400).json({ error: '필수 결제 정보가 없습니다.' })
   }
 
-  const safeUid = String(decoded.uid).replace(/[^A-Za-z0-9_-]/g, '_')
+  // 클라이언트의 generateOrderId와 동일한 32자 절삭 규칙(Toss orderId 64자 제한 대응)
+  const safeUid = String(decoded.uid).replace(/[^A-Za-z0-9_-]/g, '_').slice(0, 32)
   if (!String(orderId).startsWith(`saju_${safeUid}_`)) {
     return res.status(403).json({ error: '본인의 주문이 아닙니다.' })
   }
