@@ -176,15 +176,20 @@ body {
 }
 .hero .eyebrow {
   display: inline-block;
-  padding: 5px 12px 6px;
+  padding: 5px 14px 6px;
   border-radius: 999px;
   border: 1px solid var(--line-strong);
   background: var(--hover);
-  font-family: "Playfair Display", var(--font-serif);
-  font-style: italic;
-  font-size: 0.72rem;
-  letter-spacing: 0.18em;
-  color: var(--accent-2);
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+}
+.hero .eyebrow span {
+  background: linear-gradient(100deg, var(--accent-2), var(--accent) 55%, #b98a3f);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 .hero h1 {
   margin: 16px 0;
