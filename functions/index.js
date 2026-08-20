@@ -1,4 +1,5 @@
 const { onRequest } = require('firebase-functions/v2/https')
+const { onSchedule } = require('firebase-functions/v2/scheduler')
 const { defineSecret } = require('firebase-functions/params')
 const { logger } = require('firebase-functions')
 const { initializeApp } = require('firebase-admin/app')
@@ -10,6 +11,8 @@ const cors = require('cors')
 initializeApp()
 
 const TOSS_SECRET_KEY = defineSecret('TOSS_SECRET_KEY')
+const KAKAOPAY_CID = defineSecret('KAKAOPAY_CID')
+const KAKAOPAY_SECRET_KEY = defineSecret('KAKAOPAY_SECRET_KEY')
 const KAKAO_REST_API_KEY = defineSecret('SAJU_KAKAO_REST_API_KEY')
 const KAKAO_CLIENT_SECRET = defineSecret('SAJU_KAKAO_CLIENT_SECRET')
 const NAVER_CLIENT_ID = defineSecret('SAJU_NAVER_CLIENT_ID')
@@ -20,6 +23,8 @@ const CONTACT_TO = 'joun90@gmail.com'
 const CONTACT_FROM = '영재 사주운 문의 <onboarding@resend.dev>'
 
 const MONTHLY = 4900
+// 결제 API 문서: https://developers.kakaopay.com (정기결제 CID는 카카오 별도 심사 필요)
+const KAKAOPAY_HOST = 'https://open-api.kakaopay.com'
 const ALLOWED = [
   'http://localhost:5173',
   'http://127.0.0.1:5173',
@@ -85,6 +90,31 @@ function planFromOrder(orderId, requested) {
   if (requested === 'monthly' || requested === 'lifetime') return requested
   if (String(orderId).includes('_lifetime_')) return 'lifetime'
   return 'monthly'
+}
+
+// 카카오페이 결제 API 호출 헬퍼. 실제 CID/시크릿키를 발급받으면 카카오페이 개발자 문서를
+// 기준으로 요청/응답 필드를 다시 한번 대조해 주세요(문서 갱신 가능성이 있습니다).
+async function kakaoPayRequest(path, body, secretKey) {
+  const res = await fetch(`${KAKAOPAY_HOST}${path}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `SECRET_KEY ${secretKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  })
+  const json = await res.json().catch(() => ({}))
+  if (!res.ok) {
+    const err = new Error(json.extras?.method_result_message || json.msg || '카카오페이 요청에 실패했습니다.')
+    err.detail = json
+    throw err
+  }
+  return json
+}
+
+function kakaoPayOrderId(uid) {
+  const safe = String(uid || 'guest').replace(/[^A-Za-z0-9_-]/g, '_').slice(0, 40)
+  return `saju_${safe}_monthly_${Date.now()}`
 }
 
 const app = express()
@@ -195,6 +225,7 @@ app.get('/api/subscription', async (req, res) => {
   res.json({
     plan: expired ? 'free' : (data.plan || 'free'),
     status: expired ? 'expired' : (data.status || 'active'),
+    provider: data.provider || 'toss',
     startedAt: data.startedAt || null,
     endsAt,
     canceledAt: data.canceledAt ? data.canceledAt.toDate?.().toISOString() ?? data.canceledAt : null,
@@ -419,12 +450,218 @@ app.post('/api/toss/confirm', async (req, res) => {
   }
 })
 
+// --- 카카오페이 정기결제 ---
+// 최초 등록: ready → (카카오페이 앱/웹에서 인증) → approve(sid 발급) → saju_subscriptions에 저장.
+// 이후 매달 자동 청구는 아래 chargeKakaoPaySubscriptions 스케줄 함수가 sid로 처리합니다.
+app.post('/api/kakaopay/ready', async (req, res) => {
+  const decoded = await requireUser(req, res)
+  if (!decoded) return
+
+  const cid = secretValue(KAKAOPAY_CID)
+  const secretKey = secretValue(KAKAOPAY_SECRET_KEY)
+  if (!cid || !secretKey) {
+    return res.status(500).json({ error: '카카오페이 결제가 아직 설정되지 않았습니다(KAKAOPAY_CID/KAKAOPAY_SECRET_KEY).' })
+  }
+
+  const orderId = kakaoPayOrderId(decoded.uid)
+  const origin = ALLOWED.includes(req.get('origin')) ? req.get('origin') : ALLOWED[ALLOWED.length - 1]
+  const isMobile = /android|iphone|ipad|mobile/i.test(req.get('user-agent') || '')
+
+  try {
+    const ready = await kakaoPayRequest('/online/v1/payment/ready', {
+      cid,
+      partner_order_id: orderId,
+      partner_user_id: String(decoded.uid).slice(0, 100),
+      item_name: '영재 사주운 프리미엄 월간 정기결제',
+      quantity: 1,
+      total_amount: MONTHLY,
+      tax_free_amount: 0,
+      approval_url: `${origin}/payment-success?method=kakaopay&orderId=${encodeURIComponent(orderId)}`,
+      cancel_url: `${origin}/payment-fail?method=kakaopay&reason=cancel`,
+      fail_url: `${origin}/payment-fail?method=kakaopay&reason=fail`,
+    }, secretKey)
+
+    await getFirestore().collection('saju_kakaopay_pending').doc(orderId).set({
+      uid: decoded.uid,
+      tid: ready.tid,
+      cid,
+      createdAt: FieldValue.serverTimestamp(),
+    })
+
+    res.json({
+      orderId,
+      redirectUrl: (isMobile ? ready.next_redirect_mobile_url : ready.next_redirect_pc_url) || ready.next_redirect_pc_url,
+    })
+  } catch (err) {
+    logger.error('kakaopay/ready 오류', err.detail || err)
+    res.status(502).json({ error: err.message || '카카오페이 결제 준비에 실패했습니다.' })
+  }
+})
+
+app.post('/api/kakaopay/approve', async (req, res) => {
+  const decoded = await requireUser(req, res)
+  if (!decoded) return
+
+  const { orderId, pgToken } = req.body || {}
+  if (!orderId || !pgToken) {
+    return res.status(400).json({ error: '결제 승인 정보가 없습니다.' })
+  }
+
+  const cid = secretValue(KAKAOPAY_CID)
+  const secretKey = secretValue(KAKAOPAY_SECRET_KEY)
+  if (!cid || !secretKey) {
+    return res.status(500).json({ error: '카카오페이 결제가 아직 설정되지 않았습니다.' })
+  }
+
+  const pendingRef = getFirestore().collection('saju_kakaopay_pending').doc(orderId)
+  const pendingSnap = await pendingRef.get()
+  if (!pendingSnap.exists) {
+    return res.status(400).json({ error: '결제 요청을 찾을 수 없습니다. 다시 시도해 주세요.' })
+  }
+  const pending = pendingSnap.data()
+  if (pending.uid !== decoded.uid) {
+    return res.status(403).json({ error: '본인의 주문이 아닙니다.' })
+  }
+
+  try {
+    const approved = await kakaoPayRequest('/online/v1/payment/approve', {
+      cid,
+      tid: pending.tid,
+      partner_order_id: orderId,
+      partner_user_id: String(decoded.uid).slice(0, 100),
+      pg_token: pgToken,
+    }, secretKey)
+
+    if (!approved.sid) {
+      logger.error('kakaopay/approve: 응답에 sid가 없습니다(정기결제용 CID가 맞는지 확인 필요)', approved)
+    }
+
+    const startedAt = new Date().toISOString()
+    const end = new Date()
+    end.setDate(end.getDate() + 30)
+    const endsAt = end.toISOString()
+
+    await getFirestore().collection('saju_subscriptions').doc(decoded.uid).set({
+      plan: 'premium_monthly',
+      status: 'active',
+      provider: 'kakaopay',
+      sid: approved.sid || null,
+      sidDeactivated: false,
+      orderId,
+      amount: MONTHLY,
+      method: 'kakaopay',
+      startedAt,
+      endsAt,
+      nextChargeAt: endsAt,
+      chargeFailCount: 0,
+      updatedAt: FieldValue.serverTimestamp(),
+    }, { merge: true })
+
+    await pendingRef.delete()
+
+    res.json({ ok: true, plan: 'premium_monthly', startedAt, endsAt })
+  } catch (err) {
+    logger.error('kakaopay/approve 오류', err.detail || err)
+    res.status(502).json({ error: err.message || '카카오페이 결제 승인에 실패했습니다.' })
+  }
+})
+
 app.use((req, res) => res.status(404).json({ error: 'not found' }))
 
 exports.sajuApi = onRequest(
   {
     region: 'asia-northeast3',
-    secrets: [TOSS_SECRET_KEY, KAKAO_REST_API_KEY, KAKAO_CLIENT_SECRET, NAVER_CLIENT_ID, NAVER_CLIENT_SECRET, RESEND_API_KEY],
+    secrets: [
+      TOSS_SECRET_KEY, KAKAOPAY_CID, KAKAOPAY_SECRET_KEY,
+      KAKAO_REST_API_KEY, KAKAO_CLIENT_SECRET, NAVER_CLIENT_ID, NAVER_CLIENT_SECRET, RESEND_API_KEY,
+    ],
   },
   app,
+)
+
+// 카카오페이 정기결제 자동 청구. 매일 03:00(KST)에 결제 예정(nextChargeAt)이 지난
+// 활성 구독을 sid로 재청구하고, 취소 후 이용 기간까지 끝난 구독은 카카오페이 쪽 정기결제도 정지시킵니다.
+exports.chargeKakaoPaySubscriptions = onSchedule(
+  {
+    schedule: 'every day 03:00',
+    timeZone: 'Asia/Seoul',
+    region: 'asia-northeast3',
+    secrets: [KAKAOPAY_CID, KAKAOPAY_SECRET_KEY],
+  },
+  async () => {
+    const cid = secretValue(KAKAOPAY_CID)
+    const secretKey = secretValue(KAKAOPAY_SECRET_KEY)
+    if (!cid || !secretKey) {
+      logger.warn('KAKAOPAY_CID/KAKAOPAY_SECRET_KEY가 설정되지 않아 정기결제 청구를 건너뜁니다.')
+      return
+    }
+
+    const db = getFirestore()
+    const nowIso = new Date().toISOString()
+
+    // provider/status만 동등 비교라 별도 복합 색인 없이 조회할 수 있고, 결제 예정일 비교는
+    // 메모리에서 걸러냅니다(구독자 규모상 충분히 가벼운 방식입니다).
+    const activeSnap = await db.collection('saju_subscriptions')
+      .where('provider', '==', 'kakaopay')
+      .where('status', '==', 'active')
+      .get()
+
+    for (const doc of activeSnap.docs) {
+      const data = doc.data()
+      if (!data.sid || !data.nextChargeAt || data.nextChargeAt > nowIso) continue
+
+      const orderId = kakaoPayOrderId(doc.id)
+      try {
+        await kakaoPayRequest('/online/v1/payment/subscription', {
+          cid,
+          sid: data.sid,
+          partner_order_id: orderId,
+          partner_user_id: String(doc.id).slice(0, 100),
+          item_name: '영재 사주운 프리미엄 월간 정기결제',
+          quantity: 1,
+          total_amount: MONTHLY,
+          tax_free_amount: 0,
+        }, secretKey)
+
+        const end = new Date()
+        end.setDate(end.getDate() + 30)
+        await doc.ref.set({
+          orderId,
+          endsAt: end.toISOString(),
+          nextChargeAt: end.toISOString(),
+          lastChargedAt: new Date().toISOString(),
+          chargeFailCount: 0,
+          lastChargeError: FieldValue.delete(),
+          updatedAt: FieldValue.serverTimestamp(),
+        }, { merge: true })
+      } catch (err) {
+        logger.error(`카카오페이 정기결제 청구 실패 uid=${doc.id}`, err.detail || err)
+        const failCount = (data.chargeFailCount || 0) + 1
+        await doc.ref.set({
+          chargeFailCount: failCount,
+          // 3회 연속 실패하면 자동 재시도를 멈춥니다. 만료일은 그대로 두므로
+          // endsAt이 지나면 기존 만료 로직(getSubscriptionStatus)에 따라 자연히 무료로 전환됩니다.
+          status: failCount >= 3 ? 'canceled' : 'active',
+          lastChargeError: err.message || '결제 실패',
+          updatedAt: FieldValue.serverTimestamp(),
+        }, { merge: true })
+      }
+    }
+
+    const canceledSnap = await db.collection('saju_subscriptions')
+      .where('provider', '==', 'kakaopay')
+      .where('status', '==', 'canceled')
+      .get()
+
+    for (const doc of canceledSnap.docs) {
+      const data = doc.data()
+      if (!data.sid || data.sidDeactivated || !data.endsAt || data.endsAt > nowIso) continue
+      try {
+        await kakaoPayRequest('/online/v1/payment/manage/subscription/inactive', { cid, sid: data.sid }, secretKey)
+        await doc.ref.set({ sidDeactivated: true, updatedAt: FieldValue.serverTimestamp() }, { merge: true })
+      } catch (err) {
+        logger.error(`카카오페이 정기결제 비활성화 실패 uid=${doc.id}`, err.detail || err)
+      }
+    }
+  },
 )

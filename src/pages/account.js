@@ -112,9 +112,13 @@ function cardHtml(detail) {
 
   // premium_monthly
   const canceled = status === 'canceled'
+  const isKakaoPay = (detail?.provider || 'toss') === 'kakaopay'
   const paymentLine = detail?.amount
     ? `<p class="sub-note">최근 결제: ₩${Number(detail.amount).toLocaleString('ko-KR')}${detail.method ? ` · ${escapeHtml(detail.method)}` : ''}</p>`
     : ''
+  const activeDesc = isKakaoPay
+    ? `카카오페이 정기결제로 ${formatDate(endsAt)}에 자동 갱신됩니다.`
+    : `이 구독은 자동으로 다시 결제되지 않아요. ${formatDate(endsAt)}까지 이용 가능하며, 계속 쓰려면 만료 전 다시 구독해 주세요.`
   return `
     <div class="sub-status-head">
       <div>
@@ -124,15 +128,15 @@ function cardHtml(detail) {
     </div>
     <p class="sub-desc">
       ${canceled
-        ? `${formatDate(endsAt)}까지 프리미엄 혜택을 계속 이용할 수 있고, 이후 자동으로 무료 플랜으로 전환됩니다.`
-        : `이 구독은 자동으로 다시 결제되지 않아요. ${formatDate(endsAt)}까지 이용 가능하며, 계속 쓰려면 만료 전 다시 구독해 주세요.`}
+        ? `${formatDate(endsAt)}까지 프리미엄 혜택을 계속 이용할 수 있고, 이후 자동 갱신 없이 무료 플랜으로 전환됩니다.`
+        : activeDesc}
       ${left != null ? ` (약 ${left}일 남음)` : ''}
     </p>
     ${paymentLine}
     <div class="account-actions" data-sub-actions>
       ${canceled
         ? `<button type="button" class="btn-secondary" data-reactivate>구독 재개</button>`
-        : `<button type="button" class="btn-ghost is-danger" data-cancel>구독 취소</button>`}
+        : `<button type="button" class="btn-ghost is-danger" data-cancel>${isKakaoPay ? '자동 갱신 취소' : '구독 취소'}</button>`}
     </div>`
 }
 

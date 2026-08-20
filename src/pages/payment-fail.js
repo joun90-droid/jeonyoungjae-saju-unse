@@ -9,7 +9,11 @@ export const meta = {
 export function render() {
   const q = new URLSearchParams(location.search)
   const code = q.get('code') || ''
-  const message = q.get('message') || '결제가 완료되지 않았습니다.'
+  const reason = q.get('reason') || ''
+  const defaultMessage = reason === 'cancel'
+    ? '카카오페이 결제를 취소했습니다.'
+    : '결제가 완료되지 않았습니다.'
+  const message = q.get('message') || defaultMessage
   return pageTemplate({
     kicker: 'Payment',
     title: '결제 실패',
