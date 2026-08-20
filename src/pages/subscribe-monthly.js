@@ -4,7 +4,6 @@ import { SITE } from './site.js'
 import { openLogin } from './google-login.js'
 
 export const MONTHLY_AMOUNT = 4900
-export const LIFETIME_AMOUNT = 29900
 
 export function generateOrderId(uid, plan) {
   const safe = String(uid || 'guest').replace(/[^A-Za-z0-9_-]/g, '_')
@@ -47,14 +46,6 @@ export async function handleMonthlyPayment() {
     amount: MONTHLY_AMOUNT,
     orderName: '영재 사주운 프리미엄 월간 (1개월)',
     plan: 'monthly',
-  })
-}
-
-export async function handleLifetimePayment() {
-  return startTossPay({
-    amount: LIFETIME_AMOUNT,
-    orderName: '영재 사주운 프리미엄 평생',
-    plan: 'lifetime',
   })
 }
 

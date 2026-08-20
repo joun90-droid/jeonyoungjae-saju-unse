@@ -174,6 +174,16 @@ function init() {
 
     e.preventDefault()
 
+    const base = getBirthBase()
+
+    if (!isValidCalendarDate(base.year, base.month, base.day)) {
+
+      alert(`${base.year}년 ${base.month}월 ${base.day}일은 실제로 존재하지 않는 날짜예요. 생년월일을 다시 확인해 주세요.`)
+
+      return
+
+    }
+
     const unknownTime = unknownTimeEl.checked
 
     if (unknownTime && !guessResult) {
@@ -464,6 +474,11 @@ function applyGuessedTime(sijin) {
 }
 
 
+
+function isValidCalendarDate(year, month, day) {
+  const d = new Date(year, month - 1, day)
+  return d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === day
+}
 
 function getBirthBase() {
 

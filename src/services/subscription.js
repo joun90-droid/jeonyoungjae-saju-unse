@@ -218,7 +218,7 @@ export function showPaywall(message = '상세 분석은 프리미엄이 필요�
         <li>만세력 5~10년 흐름</li>
         <li>알림 시간 커스텀 · 광고 없는 화면</li>
       </ul>
-      <p class="price-line"><strong>₩4,900</strong>/월 · 평생 <strong>₩29,900</strong></p>
+      <p class="price-line"><strong>₩4,900</strong>/월</p>
       <div class="guess-actions">
         <a class="btn-secondary" href="/pricing">구독하기</a>
         <button type="button" class="btn-ghost" data-paywall-close>닫기</button>

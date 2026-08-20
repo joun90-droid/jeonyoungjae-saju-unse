@@ -133,7 +133,6 @@ function cardHtml(detail) {
       ${canceled
         ? `<button type="button" class="btn-secondary" data-reactivate>구독 재개</button>`
         : `<button type="button" class="btn-ghost is-danger" data-cancel>구독 취소</button>`}
-      <a class="btn-ghost" href="/pricing">평생으로 업그레이드</a>
     </div>`
 }
 

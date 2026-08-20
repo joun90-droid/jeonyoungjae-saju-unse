@@ -1,14 +1,14 @@
 import { getCurrentUser } from '../lib/auth.js'
 import { getSubscriptionStatus, statusLabel } from '../services/subscription.js'
 import { crumbs, pageTemplate } from './layout.js'
-import { handleLifetimePayment, handleMonthlyPayment } from './subscribe-monthly.js'
+import { handleMonthlyPayment } from './subscribe-monthly.js'
 import { openLogin } from './google-login.js'
 import { SITE } from './site.js'
 
 export const meta = {
   path: '/pricing',
   title: '프리미엄 | 영재 사주운',
-  description: '영재 사주운 프리미엄. 월간 ₩4,900 · 평생 ₩29,900. 로그인 후 Toss로 결제합니다.',
+  description: '영재 사주운 프리미엄. 월간 ₩4,900. 로그인 후 Toss로 결제합니다.',
 }
 
 export function render() {
@@ -47,28 +47,14 @@ export function render() {
             <li>알림 커스텀</li>
           </ul>
           <button type="button" class="btn-primary" data-pay="monthly" ${monthlyOn || lifeOn ? 'disabled' : ''}>
-            ${monthlyOn ? '구독 중' : '월간 구독하기'}
-          </button>
-          <p class="privacy">로그인 후 Toss로 결제</p>
-        </article>
-        <article class="price-card">
-          <p class="eyebrow">PREMIUM LIFETIME</p>
-          <h3>프리미엄 평생</h3>
-          <p class="price-num">₩29,900<span>한 번만</span></p>
-          <ul>
-            <li>PREMIUM의 모든 기능</li>
-            <li>추가 비용 없음</li>
-            <li>업데이트 평생 포함</li>
-          </ul>
-          <button type="button" class="btn-secondary btn-block" data-pay="lifetime" ${lifeOn ? 'disabled' : ''}>
-            ${lifeOn ? '구독 중' : '평생 구독하기'}
+            ${lifeOn ? '평생 이용 중' : monthlyOn ? '구독 중' : '월간 구독하기'}
           </button>
           <p class="privacy">로그인 후 Toss로 결제</p>
         </article>
       </div>
       <p class="login-status is-error" data-pay-status hidden></p>
       <aside class="info-callout">
-        <p><strong>서비스 제공기간</strong>: 월간은 결제일로부터 30일, 평생은 기간 제한 없이 즉시 활성화됩니다. 자동 재결제는 없습니다.</p>
+        <p><strong>서비스 제공기간</strong>: 결제일로부터 30일간 이용할 수 있으며, 자동 재결제는 없습니다.</p>
         <p><strong>취소·환불</strong>: 결제 후 7일 이내 미이용 시 전액 환불되며, 이용 개시 후에는 관련 법률에 따라 청약철회가 제한될 수 있습니다. 월간 구독은 <a href="/account">구독 관리</a>에서 언제든 취소할 수 있습니다. 자세한 조건은 <a href="/terms-of-service">이용약관</a>을 확인해 주세요.</p>
         <p>문의·이의신청: <a href="mailto:${SITE.email}">${SITE.email}</a> · ${SITE.phone}</p>
       </aside>
@@ -85,10 +71,9 @@ export function bind(root) {
   }
 
   const pay = new URLSearchParams(location.search).get('pay')
-  if (pay === 'monthly' || pay === 'lifetime') {
+  if (pay === 'monthly') {
     if (getCurrentUser()) {
-      const run = pay === 'lifetime' ? handleLifetimePayment : handleMonthlyPayment
-      run().catch((err) => show(err.message))
+      handleMonthlyPayment().catch((err) => show(err.message))
     }
   }
 
@@ -101,8 +86,7 @@ export function bind(root) {
       }
       show('')
       try {
-        if (plan === 'lifetime') await handleLifetimePayment()
-        else await handleMonthlyPayment()
+        await handleMonthlyPayment()
       } catch (err) {
         show(err.message || '결제창을 열지 못했습니다.')
       }

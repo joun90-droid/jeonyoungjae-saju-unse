@@ -20,7 +20,6 @@ const CONTACT_TO = 'joun90@gmail.com'
 const CONTACT_FROM = '영재 사주운 문의 <onboarding@resend.dev>'
 
 const MONTHLY = 4900
-const LIFETIME = 29900
 const ALLOWED = [
   'http://localhost:5173',
   'http://127.0.0.1:5173',
@@ -369,8 +368,10 @@ app.post('/api/toss/confirm', async (req, res) => {
   }
 
   const planKey = planFromOrder(orderId, requestedPlan)
-  const expected = planKey === 'lifetime' ? LIFETIME : MONTHLY
-  if (Number(amount) !== expected) {
+  if (planKey === 'lifetime') {
+    return res.status(400).json({ error: '평생 구독은 더 이상 제공되지 않습니다. 월간 구독을 이용해 주세요.' })
+  }
+  if (Number(amount) !== MONTHLY) {
     return res.status(400).json({ error: '결제 금액이 요금제와 맞지 않습니다.' })
   }
 
@@ -394,10 +395,9 @@ app.post('/api/toss/confirm', async (req, res) => {
 
     const startedAt = new Date().toISOString()
     const end = new Date()
-    if (planKey === 'lifetime') end.setFullYear(end.getFullYear() + 99)
-    else end.setDate(end.getDate() + 30)
+    end.setDate(end.getDate() + 30)
     const endsAt = end.toISOString()
-    const plan = planKey === 'lifetime' ? 'premium_lifetime' : 'premium_monthly'
+    const plan = 'premium_monthly'
 
     await getFirestore().collection('saju_subscriptions').doc(decoded.uid).set({
       plan,

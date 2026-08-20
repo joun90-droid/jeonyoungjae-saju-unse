@@ -120,7 +120,9 @@ body {
   background: var(--hover);
 }
 .policy-page section { margin-bottom: 1.1rem; }
-.policy-page ul { margin: 0; padding-left: 1.2em; color: var(--muted); }
+.policy-page ul, .policy-page ol { margin: 0; padding-left: 1.2em; color: var(--muted); }
+.policy-page li + li { margin-top: 6px; }
+.policy-page li > ul { margin-top: 6px; }
 .page-actions {
   display: flex;
   align-items: center;
@@ -752,7 +754,10 @@ textarea { resize: vertical; min-height: 120px; line-height: 1.8; }
 }
 
 .page-table {
+  display: block;
   width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border-collapse: collapse;
   font-size: 0.8rem;
   margin: 0 0 1rem;
@@ -1318,7 +1323,7 @@ textarea { resize: vertical; min-height: 120px; line-height: 1.8; }
 .btn-ghost.is-danger:hover { background: rgba(240, 132, 127, 0.1); }
 
 @media (min-width: 900px) {
-  .price-grid { display: grid; grid-template-columns: repeat(3, 1fr); align-items: stretch; }
+  .price-grid { display: grid; grid-template-columns: repeat(2, 1fr); align-items: stretch; }
 }
 
 @media (max-width: 800px) {

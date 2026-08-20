@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /account
+Disallow: /payment-success
+Disallow: /payment-fail
+Disallow: /auth/
+
+Sitemap: https://jeonyoungjae-saju-unse.web.app/sitemap.xml
