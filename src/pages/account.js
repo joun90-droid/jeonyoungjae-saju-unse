@@ -4,6 +4,7 @@ import {
   fetchSubscriptionDetail,
   getSubscriptionStatus,
   reactivateSubscription,
+  requestRefund,
 } from '../services/subscription.js'
 import { crumbs, pageTemplate } from './layout.js'
 
@@ -116,12 +117,16 @@ function cardHtml(detail) {
   // premium_monthly
   const canceled = status === 'canceled'
   const isKakaoPay = (detail?.provider || 'toss') === 'kakaopay'
+  const refundEligible = Boolean(detail?.refundEligible)
   const paymentLine = detail?.amount
     ? `<p class="sub-note">최근 결제: ₩${Number(detail.amount).toLocaleString('ko-KR')}${detail.method ? ` · ${escapeHtml(detail.method)}` : ''}</p>`
     : ''
   const activeDesc = isKakaoPay
     ? `카카오페이 정기결제로 ${formatDate(endsAt)}에 자동 갱신됩니다.`
     : `이 구독은 자동으로 다시 결제되지 않아요. ${formatDate(endsAt)}까지 이용 가능하며, 계속 쓰려면 만료 전 다시 구독해 주세요.`
+  const refundNote = refundEligible
+    ? `<p class="sub-note">아직 프리미엄 기능을 이용하지 않으셨네요. 결제일로부터 7일 이내이면 아래에서 바로 환불받을 수 있어요.</p>`
+    : ''
   return `
     <div class="sub-status-head">
       <div>
@@ -136,10 +141,21 @@ function cardHtml(detail) {
       ${left != null ? ` (약 ${left}일 남음)` : ''}
     </p>
     ${paymentLine}
+    ${refundNote}
     <div class="account-actions" data-sub-actions>
       ${canceled
         ? `<button type="button" class="btn-secondary" data-reactivate>구독 재개</button>`
         : `<button type="button" class="btn-ghost is-danger" data-cancel>${isKakaoPay ? '자동 갱신 취소' : '구독 취소'}</button>`}
+      ${refundEligible ? `<button type="button" class="btn-ghost" data-refund>7일 이내 미사용 환불</button>` : ''}
+    </div>`
+}
+
+function confirmRefundHtml() {
+  return `
+    <p class="sub-note is-warn">환불하면 프리미엄 이용이 즉시 종료되고 결제 금액이 결제 수단으로 환불됩니다. 계속할까요?</p>
+    <div class="account-actions" data-sub-actions>
+      <button type="button" class="btn-primary" data-refund-confirm>예, 환불합니다</button>
+      <button type="button" class="btn-ghost" data-refund-abort>아니요, 유지할게요</button>
     </div>`
 }
 
@@ -206,6 +222,24 @@ export function bind(root) {
         showMsg(err.message || '재활성화 중 오류가 발생했습니다.', true)
         paint()
       }
+    })
+    card.querySelector('[data-refund]')?.addEventListener('click', () => {
+      card.insertAdjacentHTML('beforeend', confirmRefundHtml())
+      card.querySelector('[data-refund-abort]')?.addEventListener('click', paint)
+      card.querySelector('[data-refund-confirm]')?.addEventListener('click', async (e) => {
+        const btn = e.currentTarget
+        btn.disabled = true
+        btn.textContent = '처리 중…'
+        try {
+          await requestRefund()
+          detail = await fetchSubscriptionDetail()
+          showMsg('환불이 완료되었습니다.')
+          paint()
+        } catch (err) {
+          showMsg(err.message || '환불 처리 중 오류가 발생했습니다.', true)
+          paint()
+        }
+      })
     })
   }
 

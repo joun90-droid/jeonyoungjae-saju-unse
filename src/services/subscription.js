@@ -163,6 +163,25 @@ export async function reactivateSubscription() {
   return data
 }
 
+let usagePinged = false
+
+// 프리미엄 잠금 콘텐츠가 실제로 열리는 순간(lockHtml/requirePremium) 서버에 한 번 알려서,
+// 결제 후 7일 이내 미이용 자동환불 대상에서 제외되도록 표시합니다. 실패하면 다음 호출 때 재시도합니다.
+export function markPremiumUsed() {
+  if (usagePinged || !isPremiumValid()) return
+  usagePinged = true
+  import('../lib/auth.js')
+    .then(({ postJson }) => postJson('/api/subscription/mark-used', {}, { auth: true }))
+    .catch(() => { usagePinged = false })
+}
+
+export async function requestRefund() {
+  const { postJson } = await import('../lib/auth.js')
+  const data = await postJson('/api/subscription/refund', {}, { auth: true })
+  await refreshSubscriptionFromServer()
+  return data
+}
+
 export function showLoginPaywall(message = '상세 해석은 로그인 후 이용 가능합니다.') {
   let el = document.getElementById('paywall')
   if (!el) {
@@ -249,13 +268,19 @@ export function requirePremium(message) {
     showLoginPaywall(message || '상세 해석은 로그인 후 이용 가능합니다.')
     return false
   }
-  if (isPremium()) return true
+  if (isPremium()) {
+    markPremiumUsed()
+    return true
+  }
   showPaywall(message)
   return false
 }
 
 export function lockHtml(inner, teaser = '프리미엄에서 이어서 볼 수 있습니다.') {
-  if (isPremium()) return inner
+  if (isPremium()) {
+    markPremiumUsed()
+    return inner
+  }
   return `
     <div class="premium-lock">
       <div class="premium-lock-body">${inner}</div>

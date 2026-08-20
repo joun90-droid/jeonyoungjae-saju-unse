@@ -92,6 +92,20 @@ function planFromOrder(orderId, requested) {
   return 'monthly'
 }
 
+const REFUND_WINDOW_MS = 7 * 24 * 60 * 60 * 1000
+
+// 결제 후 7일 이내 + 프리미엄 기능을 한 번도 쓰지 않은 경우에만 자동 환불 대상입니다
+// (이용약관 제6조 청약철회 조항과 동일한 기준).
+function computeRefundEligible(data) {
+  if (!data || data.plan !== 'premium_monthly') return false
+  if (data.status === 'refunded') return false
+  if (data.hasUsedPremium) return false
+  if (!data.startedAt) return false
+  const started = new Date(data.startedAt).getTime()
+  if (Number.isNaN(started)) return false
+  return Date.now() - started <= REFUND_WINDOW_MS
+}
+
 // 카카오페이 결제 API 호출 헬퍼. 실제 CID/시크릿키를 발급받으면 카카오페이 개발자 문서를
 // 기준으로 요청/응답 필드를 다시 한번 대조해 주세요(문서 갱신 가능성이 있습니다).
 async function kakaoPayRequest(path, body, secretKey) {
@@ -232,6 +246,8 @@ app.get('/api/subscription', async (req, res) => {
     amount: data.amount ?? null,
     method: data.method || null,
     orderId: data.orderId || null,
+    hasUsedPremium: Boolean(data.hasUsedPremium),
+    refundEligible: computeRefundEligible(data),
   })
 })
 
@@ -266,6 +282,91 @@ app.post('/api/subscription/reactivate', async (req, res) => {
   }
   await ref.set({ status: 'active', canceledAt: FieldValue.delete() }, { merge: true })
   res.json({ ok: true, plan: data.plan, status: 'active', endsAt })
+})
+
+// 프리미엄 잠금 콘텐츠가 실제로 열람될 때 클라이언트가 호출합니다(services/subscription.js의
+// lockHtml/requirePremium). 이후 7일 이내 자동환불 대상에서 제외하는 데 씁니다.
+app.post('/api/subscription/mark-used', async (req, res) => {
+  const decoded = await requireUser(req, res)
+  if (!decoded) return
+  const ref = getFirestore().collection('saju_subscriptions').doc(decoded.uid)
+  const snap = await ref.get()
+  if (!snap.exists) return res.json({ ok: true })
+  const data = snap.data()
+  if (data.plan === 'premium_monthly' && !data.hasUsedPremium) {
+    await ref.set({ hasUsedPremium: true, updatedAt: FieldValue.serverTimestamp() }, { merge: true })
+  }
+  res.json({ ok: true })
+})
+
+// 결제 후 7일 이내 + 미이용 시 자동환불. 이용약관 제6조 청약철회 조항을 그대로 구현합니다.
+app.post('/api/subscription/refund', async (req, res) => {
+  const decoded = await requireUser(req, res)
+  if (!decoded) return
+  const ref = getFirestore().collection('saju_subscriptions').doc(decoded.uid)
+  const snap = await ref.get()
+  if (!snap.exists) return res.status(400).json({ error: '환불할 구독이 없습니다.' })
+  const data = snap.data()
+  if (!computeRefundEligible(data)) {
+    const reason = data.hasUsedPremium
+      ? '이미 프리미엄 기능을 이용하셔서 자동환불 대상이 아닙니다. 문의를 남겨 주세요.'
+      : '결제일로부터 7일이 지났거나 환불 대상이 아닙니다. 문의를 남겨 주세요.'
+    return res.status(400).json({ error: reason })
+  }
+
+  try {
+    if (data.provider === 'kakaopay') {
+      const cid = secretValue(KAKAOPAY_CID)
+      const secretKey = secretValue(KAKAOPAY_SECRET_KEY)
+      if (!cid || !secretKey || !data.tid) {
+        return res.status(500).json({ error: '환불 처리에 필요한 결제 정보가 없습니다. 문의를 남겨 주세요.' })
+      }
+      await kakaoPayRequest('/online/v1/payment/cancel', {
+        cid,
+        tid: data.tid,
+        cancel_amount: Number(data.amount) || MONTHLY,
+        cancel_tax_free_amount: 0,
+      }, secretKey)
+      if (data.sid && !data.sidDeactivated) {
+        try {
+          await kakaoPayRequest('/online/v1/payment/manage/subscription/inactive', { cid, sid: data.sid }, secretKey)
+        } catch (err) {
+          logger.error(`환불 후 카카오페이 정기결제 비활성화 실패 uid=${decoded.uid}`, err.detail || err)
+        }
+      }
+    } else {
+      const secretKey = secretValue(TOSS_SECRET_KEY)
+      if (!secretKey || !data.paymentKey) {
+        return res.status(500).json({ error: '환불 처리에 필요한 결제 정보가 없습니다. 문의를 남겨 주세요.' })
+      }
+      const basicAuth = `Basic ${Buffer.from(`${secretKey}:`).toString('base64')}`
+      const tossRes = await fetch(`https://api.tosspayments.com/v1/payments/${data.paymentKey}/cancel`, {
+        method: 'POST',
+        headers: { Authorization: basicAuth, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cancelReason: '결제 후 7일 이내 미사용 환불' }),
+      })
+      const tossJson = await tossRes.json()
+      if (!tossRes.ok) {
+        logger.error('Toss 환불 실패', tossJson)
+        return res.status(502).json({ error: tossJson.message || '환불 요청에 실패했습니다.' })
+      }
+    }
+
+    const nowIso = new Date().toISOString()
+    await ref.set({
+      status: 'refunded',
+      plan: 'free',
+      endsAt: nowIso,
+      sidDeactivated: true,
+      refundedAt: nowIso,
+      updatedAt: FieldValue.serverTimestamp(),
+    }, { merge: true })
+
+    res.json({ ok: true, plan: 'free' })
+  } catch (err) {
+    logger.error(`환불 처리 오류 uid=${decoded.uid}`, err.detail || err)
+    res.status(502).json({ error: err.message || '환불 처리 중 오류가 발생했습니다.' })
+  }
 })
 
 function isSajuRedirect(redirectUri) {
@@ -440,6 +541,7 @@ app.post('/api/toss/confirm', async (req, res) => {
       method: tossJson.method || null,
       startedAt,
       endsAt,
+      hasUsedPremium: false,
       updatedAt: FieldValue.serverTimestamp(),
     }, { merge: true })
 
@@ -547,6 +649,7 @@ app.post('/api/kakaopay/approve', async (req, res) => {
       provider: 'kakaopay',
       sid: approved.sid || null,
       sidDeactivated: false,
+      tid: pending.tid || null,
       orderId,
       amount: MONTHLY,
       method: 'kakaopay',
@@ -554,6 +657,7 @@ app.post('/api/kakaopay/approve', async (req, res) => {
       endsAt,
       nextChargeAt: endsAt,
       chargeFailCount: 0,
+      hasUsedPremium: false,
       updatedAt: FieldValue.serverTimestamp(),
     }, { merge: true })
 
