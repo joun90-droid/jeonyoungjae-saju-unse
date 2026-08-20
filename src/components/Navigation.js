@@ -64,4 +64,10 @@ export function renderAuthBar(root = document.getElementById('authBar')) {
 export function mountAuthBar(root = document.getElementById('authBar')) {
   renderAuthBar(root)
   subscribeAuth(() => renderAuthBar(root))
+  // <details>는 기본적으로 summary를 다시 눌러야 닫혀서, 바깥을 클릭해도 닫히도록 보강합니다.
+  document.addEventListener('click', (e) => {
+    const details = root?.querySelector('.auth-menu')
+    if (!details || !details.open || details.contains(e.target)) return
+    details.open = false
+  })
 }
