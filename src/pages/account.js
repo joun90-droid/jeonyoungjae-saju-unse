@@ -94,7 +94,10 @@ function cardHtml(detail) {
       <p class="sub-desc">상세 운세 해석, 만세력 장기 흐름, 광고 제거 등은 프리미엄에서 열립니다.</p>
       ${expiredNote}
       <div class="account-actions">
-        <a class="btn-primary" href="/pricing">프리미엄 시작하기</a>
+        <a class="btn-primary btn-upgrade" href="/pricing">
+          <span>프리미엄 업그레이드</span>
+          <svg class="btn-upgrade-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
       </div>`
   }
 

@@ -738,8 +738,10 @@ textarea { resize: vertical; min-height: 120px; line-height: 1.8; }
   line-height: 1.85;
 }
 .prose li + li { margin-top: 8px; }
-.prose a { color: var(--accent); text-decoration: none; }
-.prose a:hover { text-decoration: underline; }
+/* 버튼 클래스가 붙은 링크는 prose 링크색(금색)을 물려받지 않게 제외합니다.
+   안 그러면 .btn-primary의 금색 배경 위에 이 규칙의 금색 글자가 겹쳐 텍스트가 안 보입니다. */
+.prose a:not(.btn-primary, .btn-secondary, .btn-ghost) { color: var(--accent); text-decoration: none; }
+.prose a:not(.btn-primary, .btn-secondary, .btn-ghost):hover { text-decoration: underline; }
 .prose strong { color: var(--text); }
 
 .info-callout {
@@ -1324,6 +1326,27 @@ textarea { resize: vertical; min-height: 120px; line-height: 1.8; }
 .account-actions .btn-primary,
 .account-actions .btn-secondary,
 .account-actions .btn-ghost { width: auto; margin-top: 0; }
+.btn-upgrade {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+  padding-left: 22px;
+  padding-right: 18px;
+}
+.btn-upgrade-arrow { width: 16px; height: 16px; flex-shrink: 0; transition: transform 0.2s ease; }
+.btn-upgrade:hover .btn-upgrade-arrow { transform: translateX(3px); }
+.btn-upgrade::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.55) 48%, transparent 60%);
+  transform: translateX(-130%);
+  transition: transform 0.6s ease;
+}
+.btn-upgrade:hover::after { transform: translateX(130%); }
 .btn-ghost.is-danger { color: var(--low); }
 .btn-ghost.is-danger:hover { background: rgba(240, 132, 127, 0.1); }
 
