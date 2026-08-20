@@ -33,7 +33,7 @@ export function authBarHtml(user = getCurrentUser()) {
         <summary>${photo}<span>${escapeHtml(user.name)}</span></summary>
         <div class="auth-dropdown">
           <p><strong>${escapeHtml(user.name)}</strong></p>
-          <p class="privacy">${escapeHtml(user.email || '')}</p>
+          ${user.email && user.email !== user.name ? `<p class="privacy">${escapeHtml(user.email)}</p>` : ''}
           <a class="auth-dropdown-link" href="/account">
             <span>구독: ${statusLabel(status)}</span>
             <span class="auth-dropdown-arrow" aria-hidden="true">→</span>
