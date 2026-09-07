@@ -75,37 +75,16 @@
         <a href="/daily-fortune">오늘</a>
         <a href="/compatibility">궁합</a>
         <a href="/guide">가이드</a>
-        <a href="/about-us">운영자 소개</a>
-        <a href="/pricing">요금</a>
+        <a href="/pricing">프리미엄</a>
       </nav>
+      <div id="authBar" class="auth-bar" aria-label="로그인 상태"></div>
     </header>
-    <div id="authBar" class="auth-bar" aria-label="로그인 상태"></div>
-    <nav class="legal-nav" aria-label="개인정보 약관 소개 연락처">
-      <a href="/">홈</a>
-      <a href="/privacy-policy">개인정보</a>
-      <a href="/terms-of-service">약관</a>
-      <a href="/about-us">소개</a>
-      <a href="/contact">연락처</a>
-    </nav>
 
     <main class="main">
       <div id="homeView">
-        <aside id="guestNotice" class="guest-notice" hidden>
-          <p>프리미엄 기능은 로그인 후 이용 가능합니다. 기본 사주 분석은 바로 써 보세요.</p>
-          <button type="button" class="btn-ghost" data-dismiss-guest>닫기</button>
-        </aside>
         <section class="hero card">
-          <p class="eyebrow"><span>영재 사주운</span></p>
           <h1>사주로 보는<br><span>재물 · 연애 · 투자 · 직업 · 시기</span></h1>
           <p class="hero-lead">생년월일시로 사주를 계산하고, 과거·현재·미래 흐름과 재물운·연애운·투자·직업 추천을 정리합니다.</p>
-          <div class="tool-grid">
-            <a href="/daily-fortune"><svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg><span>오늘의 운세</span></a>
-            <a href="/psychology-test"><svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3 11.2c.6.4 1 1.1 1 1.8h4c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3Z"/></svg><span>심리테스트</span></a>
-            <a href="/compatibility"><svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.35-9.5-8.5C.8 8.5 2 5 5.5 5c2 0 3.5 1.2 4.5 2.7C11 6.2 12.5 5 14.5 5 18 5 19.2 8.5 17.5 11.5 15 15.65 12 20 12 20Z"/></svg><span>궁합</span></a>
-            <a href="/chart"><svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="16" rx="2"/><path d="M3.5 9.5h17M8 3v3M16 3v3"/></svg><span>만세력</span></a>
-            <a href="/tarot"><svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M12 8.5l1 2 2.2.3-1.6 1.6.4 2.2-2-1.1-2 1.1.4-2.2-1.6-1.6L11 10.5l1-2Z"/></svg><span>타로</span></a>
-            <a href="/mbti"><svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.2"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.2"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.2"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.2"/></svg><span>MBTI</span></a>
-          </div>
         </section>
 
         <form class="card form" id="birthForm">
@@ -129,7 +108,7 @@
             </label>
             <label class="check unknown">
               <input type="checkbox" id="unknownTime">
-              <span>시간 모름 → 질문으로 추정</span>
+              <span>시간 모름<span class="check-sub"> → 질문으로 추정</span></span>
             </label>
           </div>
           <div class="row detail-row">
@@ -142,7 +121,7 @@
                 <span class="depth-tick" data-idx="2">완벽</span>
               </div>
             </div>
-            <p class="detail-hint">한눈에=핵심+짧은 상세 · 통찰=장문 · 완벽=최장문·정밀</p>
+            <p class="detail-hint">한눈에=요약 · 통찰=장문 · 완벽=최장문·정밀</p>
           </div>
           <div class="row gender-row">
             <span class="label">성별</span>
@@ -182,6 +161,12 @@
           </div>
         </section>
 
+        <aside id="guestNotice" class="guest-notice" hidden>
+          <p>프리미엄 기능은 로그인 후 이용 가능합니다. 기본 사주 분석은 바로 써 보세요.</p>
+          <button type="button" class="btn-ghost" data-dismiss-guest>닫기</button>
+        </aside>
+
+
         <div id="results" class="results" hidden>
           <section class="card pillar-card" id="pillarCard"></section>
           <nav class="tabs" id="tabs" role="tablist">
@@ -193,38 +178,25 @@
           </nav>
           <div id="panel" class="panels"></div>
         </div>
+
+        <section class="card tools-card" aria-labelledby="toolsTitle">
+          <h2 class="tools-title" id="toolsTitle">다른 도구</h2>
+          <div class="tool-grid">
+            <a href="/daily-fortune"><svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg><span>오늘의 운세</span></a>
+          <a href="/psychology-test"><svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3 11.2c.6.4 1 1.1 1 1.8h4c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3Z"/></svg><span>심리테스트</span></a>
+          <a href="/compatibility"><svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.35-9.5-8.5C.8 8.5 2 5 5.5 5c2 0 3.5 1.2 4.5 2.7C11 6.2 12.5 5 14.5 5 18 5 19.2 8.5 17.5 11.5 15 15.65 12 20 12 20Z"/></svg><span>궁합</span></a>
+          <a href="/chart"><svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="16" rx="2"/><path d="M3.5 9.5h17M8 3v3M16 3v3"/></svg><span>만세력</span></a>
+          <a href="/tarot"><svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M12 8.5l1 2 2.2.3-1.6 1.6.4 2.2-2-1.1-2 1.1.4-2.2-1.6-1.6L11 10.5l1-2Z"/></svg><span>타로</span></a>
+          <a href="/mbti"><svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.2"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.2"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.2"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.2"/></svg><span>MBTI</span></a>
+        </div>
+        </section>
       </div>
+
 
       <div id="pageView" hidden></div>
     </main>
 
-    <footer class="footer">
-      <nav class="footer-nav" aria-label="도구">
-        <a href="/daily-fortune">오늘의 운세</a>
-        <a href="/psychology-test">심리테스트</a>
-        <a href="/compatibility">궁합</a>
-        <a href="/chart">만세력</a>
-        <a href="/tarot">타로</a>
-        <a href="/mbti">MBTI</a>
-        <a href="/pricing">프리미엄</a>
-      </nav>
-      <nav class="footer-nav" aria-label="가이드">
-        <a href="/guide">사주 가이드</a>
-        <a href="/five-elements">오행</a>
-        <a href="/zodiac-signs">12띠</a>
-        <a href="/faq">FAQ</a>
-      </nav>
-      <nav class="footer-nav footer-legal" aria-label="정책">
-        <a href="/privacy-policy">개인정보처리방침</a>
-        <a href="/terms-of-service">이용약관</a>
-        <a href="/about-us">소개</a>
-        <a href="/contact">연락처</a>
-      </nav>
-      <p>본 서비스는 오락·참고용이며, 투자·의료·법률 조언이 아닙니다.</p>
-      <p class="footer-biz">와이제이인터내셔널(대표: 전영재) · 사업자등록번호 569-10-02302 · 경기도 파주시 해올로 20 (다율동, 해오름마을 12단지) 1206-1404 · 010-7196-5587</p>
-      <p>문의: <a href="mailto:joun90@gmail.com">joun90@gmail.com</a></p>
-      <p>© 영재 사주운</p>
-    </footer>
+    <footer class="footer" id="siteFooter"></footer>
   </div>
   <script type="module" src="/src/main.js"></script>
 </body>

@@ -1,3 +1,4 @@
+import { businessLine } from '../config/business.js'
 import { SITE } from './site.js'
 
 export const AboutUs = {
@@ -39,7 +40,7 @@ export function render() {
       </p>
       <p class="contact-line">
         사업자 정보
-        <span class="biz-detail">${SITE.businessName} (대표: ${SITE.operator}) · 사업자등록번호 ${SITE.businessRegNo} · ${SITE.address} · ${SITE.phone}</span>
+        <span class="biz-detail">${businessLine()}</span>
       </p>
       <p class="trail-links">
         <a class="trail-home" href="/">홈으로</a>

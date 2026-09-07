@@ -4,6 +4,7 @@ import { saveBirth, loadBirth } from './lib/store.js'
 import { maybeNotifyToday } from './lib/notify.js'
 import { consumeGuestNotice, consumePendingSocialAuth, initAuth } from './lib/auth.js'
 import { mountAuthBar, renderAuthBar } from './components/Navigation.js'
+import { mountFooter } from './components/Footer.js'
 import { mountLogin } from './pages/google-login.js'
 
 import { analyzeOverall } from './engine/fortune.js'
@@ -36,6 +37,7 @@ let guessedTimeMeta = null
 
 function init() {
   initAuth()
+  mountFooter()
   mountAuthBar()
   mountLogin()
   const bar = document.getElementById('authBar')

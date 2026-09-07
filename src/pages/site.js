@@ -1,44 +1,45 @@
+import { BUSINESS } from '../config/business.js'
+
+// 사업자·연락처 값은 src/config/business.js 한 곳에서만 관리합니다.
 export const SITE = {
   name: '영재 사주운',
-  operator: '전영재',
-  email: 'joun90@gmail.com',
-  phone: '010-7196-5587',
-  businessName: '와이제이인터내셔널',
-  businessRegNo: '569-10-02302',
-  address: '경기도 파주시 해올로 20 (다율동, 해오름마을 12단지) 1206-1404',
+  operator: BUSINESS.operator,
+  email: BUSINESS.email,
+  phone: BUSINESS.phone,
+  businessName: BUSINESS.businessName,
+  businessRegNo: BUSINESS.businessRegNo,
+  address: BUSINESS.address,
   origin: 'https://jeonyoungjae-saju-unse.web.app',
   effectiveDate: '2026년 8월 18일',
 }
 
-export const NAV = [
-  { href: '/', label: '홈' },
-  { href: '/daily-fortune', label: '오늘' },
-  { href: '/compatibility', label: '궁합' },
-  { href: '/guide', label: '가이드' },
-  { href: '/about-us', label: '운영자 소개' },
-  { href: '/pricing', label: '요금' },
-]
-
-export const TOOL_LINKS = [
-  { href: '/daily-fortune', label: '오늘의 운세' },
-  { href: '/psychology-test', label: '심리테스트' },
-  { href: '/compatibility', label: '궁합 분석' },
-  { href: '/chart', label: '만세력' },
-  { href: '/tarot', label: '타로' },
-  { href: '/mbti', label: 'MBTI' },
-]
-
-export const GUIDE_LINKS = [
-  { href: '/guide', label: '사주 입문 가이드' },
-  { href: '/five-elements', label: '오행(五行)' },
-  { href: '/zodiac-signs', label: '12띠 해설' },
-  { href: '/compatibility', label: '사주 궁합' },
-  { href: '/faq', label: '자주 묻는 질문' },
-]
-
-export const FOOTER_POLICY = [
-  { href: '/privacy-policy', label: '개인정보처리방침' },
-  { href: '/terms-of-service', label: '이용약관' },
-  { href: '/about-us', label: '운영자 소개' },
-  { href: '/contact', label: '연락처' },
+// 푸터 링크 그룹 — 경로는 기존 그대로, 라벨만 짧게. 그룹당 최대 4개.
+export const FOOTER_GROUPS = [
+  {
+    title: '서비스',
+    links: [
+      { href: '/daily-fortune', label: '오늘의 운세' },
+      { href: '/compatibility', label: '궁합' },
+      { href: '/chart', label: '만세력' },
+      { href: '/tarot', label: '타로' },
+    ],
+  },
+  {
+    title: '알아보기',
+    links: [
+      { href: '/guide', label: '사주 가이드' },
+      { href: '/five-elements', label: '오행' },
+      { href: '/zodiac-signs', label: '12띠' },
+      { href: '/faq', label: 'FAQ' },
+    ],
+  },
+  {
+    title: '회사',
+    links: [
+      { href: '/about-us', label: '소개' },
+      { href: '/contact', label: '연락처' },
+      { href: '/privacy-policy', label: '개인정보처리방침' },
+      { href: '/terms-of-service', label: '이용약관' },
+    ],
+  },
 ]

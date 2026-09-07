@@ -61,7 +61,7 @@ export const TermsOfService = {
           <li><strong>결제 수단·시기</strong>: 결제는 카카오페이 정기결제로 이루어지며, 매 결제 주기(30일)마다 이용자가 최초 등록한 결제수단으로 자동 청구됩니다.</li>
           <li><strong>청약철회 및 환불</strong>: 최초 결제일로부터 7일 이내이고 유료 콘텐츠를 실제로 이용하지 않은 경우 「전자상거래 등에서의 소비자보호에 관한 법률」에 따라 전액 환불됩니다. 이 경우 <a href="/account">구독 관리</a>에서 별도 문의 없이 바로 환불을 신청할 수 있습니다. 유료 콘텐츠를 1회 이상 열람하는 등 이용을 개시한 경우 청약철회가 제한될 수 있으며, 이때는 <a href="/contact">문의하기</a>로 연락해 주세요. 이미 경과한 이용기간에 대한 일할 환불은 제공하지 않습니다.</li>
           <li><strong>구독 관리 및 자동 갱신 해지</strong>: 이용자는 다음 결제 예정일 전에 언제든지 <a href="/account">구독 관리</a>에서 자동 갱신을 취소할 수 있습니다. 취소해도 이미 결제된 기간이 끝날 때까지는 프리미엄을 계속 이용할 수 있고, 이후 추가 청구 없이 무료 플랜으로 전환됩니다. 다음 결제 예정일이 지나기 전에 재개하면 자동 갱신을 다시 활성화할 수 있습니다. 결제 실패가 반복되는 경우(예: 등록된 결제수단 문제) 자동 갱신이 중단될 수 있습니다.</li>
-          <li><strong>이의신청·문의</strong>: 결제·환불 관련 이의는 <a href="mailto:${SITE.email}">${SITE.email}</a> 또는 ${SITE.phone}로 접수해 주시면 영업일 기준 3일 이내 답변드립니다.</li>
+          <li><strong>이의신청·문의</strong>: 결제·환불 관련 이의는 <a href="mailto:${SITE.email}">${SITE.email}</a>${SITE.phone ? ` 또는 ${SITE.phone}` : ''}로 접수해 주시면 영업일 기준 3일 이내 답변드립니다.</li>
         </ol>
       </section>
       <section>
@@ -93,8 +93,8 @@ export const TermsOfService = {
           <li>서비스명: ${SITE.name}</li>
           <li>상호: ${SITE.businessName} (대표: ${SITE.operator})</li>
           <li>사업자등록번호: ${SITE.businessRegNo}</li>
-          <li>사업장 주소: ${SITE.address}</li>
-          <li>연락처: ${SITE.phone} · <a href="mailto:${SITE.email}">${SITE.email}</a></li>
+          ${SITE.address ? `<li>사업장 주소: ${SITE.address}</li>` : ''}
+          <li>연락처: ${SITE.phone ? `${SITE.phone} · ` : ''}<a href="mailto:${SITE.email}">${SITE.email}</a></li>
         </ul>
       </section>
       <p class="page-date">시행일: ${SITE.effectiveDate} · 최종 수정: ${SITE.effectiveDate}</p>

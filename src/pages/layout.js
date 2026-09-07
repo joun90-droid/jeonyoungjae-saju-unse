@@ -1,4 +1,4 @@
-import { GUIDE_LINKS, SITE } from './site.js'
+import { SITE } from './site.js'
 
 export function crumbs(items) {
   return `<nav class="crumbs" aria-label="현재 위치">${items.map((it, i) => {
@@ -10,16 +10,14 @@ export function crumbs(items) {
   }).join('')}</nav>`
 }
 
-export function relatedGuides(currentHref) {
-  const links = GUIDE_LINKS.filter((l) => l.href !== currentHref)
+// 가이드 링크는 푸터 '알아보기' 그룹에 모든 페이지에서 노출되므로,
+// 글 끝에는 중복 링크 목록 대신 분석 CTA만 둡니다.
+export function relatedGuides() {
   return `
-    <nav class="card page-related" aria-label="관련 가이드">
-      <h2>관련 가이드</h2>
-      <div class="related-grid">
-        ${links.map((l) => `<a href="${l.href}">${l.label}</a>`).join('')}
-      </div>
+    <aside class="card page-cta">
+      <p class="page-cta-lead">생년월일시만 있으면 바로 계산됩니다.</p>
       <a class="btn-ghost related-cta" href="/">운세 분석하러 가기</a>
-    </nav>`
+    </aside>`
 }
 
 export function pageTemplate({ kicker, title, lead, crumbsHtml, body, related }) {

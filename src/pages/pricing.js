@@ -56,7 +56,7 @@ export function render() {
       <aside class="info-callout">
         <p><strong>서비스 제공기간</strong>: 최초 결제일로부터 30일마다 카카오페이 정기결제로 자동 갱신됩니다.</p>
         <p><strong>취소·환불</strong>: 결제 후 7일 이내 미이용 시 전액 환불되며, 이용 개시 후에는 관련 법률에 따라 청약철회가 제한될 수 있습니다. 자동 갱신은 <a href="/account">구독 관리</a>에서 다음 결제일 전에 언제든 취소할 수 있고, 취소해도 이미 결제된 기간까지는 계속 이용할 수 있습니다. 자세한 조건은 <a href="/terms-of-service">이용약관</a>을 확인해 주세요.</p>
-        <p>문의·이의신청: <a href="mailto:${SITE.email}">${SITE.email}</a> · ${SITE.phone}</p>
+        <p>문의·이의신청: <a href="mailto:${SITE.email}">${SITE.email}</a>${SITE.phone ? ` · ${SITE.phone}` : ''}</p>
       </aside>
     `,
   })

@@ -134,7 +134,7 @@ function navMatch(path) {
 
 function updateNav(path) {
   const key = navMatch(path)
-  document.querySelectorAll('.site-nav a, .legal-nav a').forEach((a) => {
+  document.querySelectorAll('.site-nav a').forEach((a) => {
     const href = a.getAttribute('href')
     a.classList.toggle('active', href === key)
   })

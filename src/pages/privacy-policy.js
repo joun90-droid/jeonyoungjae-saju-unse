@@ -42,8 +42,8 @@ export const PrivacyPolicy = {
         <ul>
           <li>상호: ${SITE.businessName} (대표: ${SITE.operator})</li>
           <li>사업자등록번호: ${SITE.businessRegNo}</li>
-          <li>사업장 주소: ${SITE.address}</li>
-          <li>연락처: ${SITE.phone} · <a href="mailto:${SITE.email}">${SITE.email}</a></li>
+          ${SITE.address ? `<li>사업장 주소: ${SITE.address}</li>` : ''}
+          <li>연락처: ${SITE.phone ? `${SITE.phone} · ` : ''}<a href="mailto:${SITE.email}">${SITE.email}</a></li>
         </ul>
       </section>
       <p class="page-date">최종 수정: ${SITE.effectiveDate}</p>
