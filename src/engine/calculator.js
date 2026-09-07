@@ -1,5 +1,7 @@
 import { calculateSaju } from '@orrery/core/saju'
 import { STEM_INFO } from '@orrery/core/constants'
+import { analyzeDeep } from './deep.js'
+import { buildLifeWave } from './life-wave.js'
 
 const ELEMENT_KO = {
   tree: '목(木)',
@@ -30,8 +32,18 @@ export function computeChart(input) {
   const sipsinCount = countSipsin(saju.pillars)
   const elementCount = countElements(saju.pillars)
 
+  // 심층 판단값(신강약·용신·격국)과 연도별 파동은 이후 모든 해석의 기준이 된다
+  const deep = analyzeDeep(saju)
+  const lifeWave = buildLifeWave(saju, deep, {
+    birthYear: input.year,
+    age,
+    gender,
+  })
+
   return {
     saju,
+    deep,
+    lifeWave,
     meta: {
       gender,
       age,

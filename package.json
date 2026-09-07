@@ -12,7 +12,8 @@
   "dependencies": {
     "@orrery/core": "^0.1.0",
     "@tosspayments/tosspayments-sdk": "^2.7.1",
-    "firebase": "^12.17.1"
+    "firebase": "^12.17.1",
+    "lunar-javascript": "^1.7.7"
   },
   "devDependencies": {
     "vite": "^7.3.1"

@@ -10,6 +10,11 @@ const SIPSIN_KO = {
   self: '비겁(比劫)',
 }
 
+/** 숫자 뒤 조사 — 받침 있는 한글 수(영·일·삼·육·칠·팔) 뒤에는 앞 형태를 쓴다 */
+function numJosa(n, withJong, withoutJong) {
+  return [0, 1, 3, 6, 7, 8].includes(Math.abs(Math.round(n)) % 10) ? withJong : withoutJong
+}
+
 function pillarLine(p, label) {
   if (!p) return ''
   return `${label} ${p.pillar.ganzi} — 천간 ${p.stemSipsin}, 지지 ${p.branchSipsin}, 12운성 ${p.unseong}`
@@ -49,6 +54,34 @@ function dwNarrative(dw) {
   return t
 }
 
+/**
+ * 신강약·용신·격국을 한 문단으로. 심층 엔진이 붙은 차트에서만 나온다.
+ * @param {ReturnType<import('./calculator.js').computeChart>} chart
+ */
+function deepNarrative(chart) {
+  const dm = chart.deep?.dayMaster
+  if (!dm) return null
+  const parts = [
+    `일간 ${dm.stem}은 득령 ${dm.breakdown.deukryeong} · 득지 ${dm.breakdown.deukji} · 득세 ${dm.breakdown.deukse}${numJosa(dm.breakdown.deukse, '을', '를')} 합쳐 ${dm.strengthScore}점, ${dm.strengthKo} 사주로 봅니다.`,
+    `격국은 ${dm.gyeokguk}${dm.gyeokgukStatus === 'provisional' ? '(투간이 없어 임시 판정)' : ''}이고, 균형을 잡아 주는 용신은 ${dm.yongsinKo}, 피해야 할 기신은 ${dm.gisinKo}입니다.`,
+  ]
+  if (dm.johuElement && dm.ambiguity?.johuConflict) {
+    parts.push(`다만 계절로 보면 ${ELEMENT_KO[dm.johuElement]}가 급해서, 억부(${dm.yongsinKo})와 조후(${ELEMENT_KO[dm.johuElement]}) 두 처방이 갈립니다. 둘 다 쓰는 해에 특히 숨통이 트입니다.`)
+  }
+  return parts.join(' ')
+}
+
+/** 올해 세운을 실제 계산값으로 설명한다 */
+function seunNarrative(chart) {
+  const cur = chart.lifeWave?.currentSeun
+  if (!cur) return null
+  const notes = cur.notes?.length ? ` 세부적으로는 ${cur.notes.slice(0, 3).join(', ')} 등이 겹칩니다.` : ''
+  const tone = cur.score100 >= 62 ? '밀어붙여도 되는 해'
+    : cur.score100 >= 45 ? '평년 수준이라 확장보다 정비가 어울리는 해'
+    : '무리한 확장보다 지키는 쪽이 이득인 해'
+  return `${cur.year}년 세운은 ${cur.ganzi}(${cur.tenGod}), 지수 ${cur.score100}${numJosa(cur.score100, '으로', '로')} ${tone}입니다.${notes}`
+}
+
 /** @param {ReturnType<import('./calculator.js').computeChart>} chart */
 export function buildOverviewNarrative(chart) {
   const { meta, stats, saju, daewoon } = chart
@@ -58,11 +91,13 @@ export function buildOverviewNarrative(chart) {
 
   return [
     `${meta.age}세 ${meta.gender === 'M' ? '남성' : '여성'} 명식, 일간 ${meta.dayStem}(${meta.dayElementKo})을 중심으로 사주를 읽으면 ${meta.dayStem}의 성질이 삶 전반의 '나'를 정의합니다. ${ELEMENT_KO[domEl] || domEl} 기운이 ${domCnt}회 등장해 전체 결이 ${domCnt >= 3 ? '이 오행 쪽으로 기울어' : '비교적 분산되어'} 있습니다.`,
+    deepNarrative(chart),
     sipsinNarrative(stats),
     `두드러지는 십신은 ${SIPSIN_KO[domSip] || domSip}(${sipCnt}개)입니다. ${pillarLine(pillars[2], '월주')} — 사회·직업·부모·청년기 환경의 바탕이 됩니다. ${pillarLine(pillars[3], '년주')} — 조상·유년기·대외 이미지와 연결됩니다.`,
     dwNarrative(daewoon.current),
+    seunNarrative(chart),
     `${meta.currentYear}년은 현재 대운과 겹치는 해이므로, 올해 선택(이직·투자·연애·이사·창업)은 향후 2~3년의 기준점이 됩니다. 사주는 가능성과 성향을 읽는 도구이며, 최종 결정은 본인의 현실 조건과 함께 하세요.`,
-  ]
+  ].filter(Boolean)
 }
 
 /** @param {ReturnType<import('./calculator.js').computeChart>} chart */
@@ -200,6 +235,19 @@ export function buildCareerNarrative(chart) {
 }
 
 /** @param {ReturnType<import('./calculator.js').computeChart>} chart — 매운맛 전용 추가 */
+/** 라이프 웨이브에서 앞으로 3년을 뽑아 한 줄씩 만든다 */
+function upcomingYears(chart) {
+  const rows = chart.lifeWave?.next10?.slice(0, 3) || []
+  if (!rows.length) return []
+  return rows.map((r) => {
+    const mood = r.score100 >= 62 ? '확장·도전에 유리'
+      : r.score100 >= 45 ? '현상 유지·정비에 적합'
+      : '지키고 버티는 쪽이 이득'
+    const risk = r.volatility ? ' 대운과 세운이 부딪혀 변동 폭이 큽니다.' : ''
+    return `${r.year}년 ${r.seun}(${r.tenGod}) 지수 ${r.score100} — ${mood}.${risk}`
+  })
+}
+
 export function buildSpicyExtras(chart) {
   const { meta, stats, saju } = chart
   const pillars = saju.pillars
@@ -208,7 +256,7 @@ export function buildSpicyExtras(chart) {
     yearly: [
       `${month}년 연간 키워드: ${stats.sipsinCount.wealth >= 2 ? '현금흐름·거래·성과' : stats.sipsinCount.power >= 2 ? '책임·승진·규율' : stats.sipsinCount.output >= 2 ? '표현·프로젝트·기술' : '자기정비·학습·관계'}.`,
       `${month}년 상반기: 기존 습관·부채·관계 정리. 하반기: 대운 기운에 맞는 한 가지(수입·자격·이직·투자)를 집중.`,
-      `${month + 1}년 전망: 대운·십신 흐름상 ${stats.sipsinCount.self >= 2 ? '경쟁·지출·고집 관리' : '저축·분산·네트워크'}가 핵심.`,
+      ...upcomingYears(chart),
     ],
     pillars: [
       pillarLine(pillars[0], '시주(말년·실행·자녀):'),

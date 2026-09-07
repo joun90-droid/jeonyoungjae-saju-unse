@@ -11,6 +11,8 @@ import { analyzeOverall } from './engine/fortune.js'
 
 import { applyDetailLevel, chartDigestBlock, detailBlockExtra, overviewBlock } from './engine/detail.js'
 
+import { deepPanelHtml } from './engine/deep-view.js'
+
 import { TIME_GUESS_QUESTIONS, guessBirthTime } from './engine/time-guess.js'
 
 import { findSijinByHour } from './engine/sijin.js'
@@ -711,6 +713,16 @@ function renderPanel(panel) {
     html += careerBlock(career, detailLevel)
 
     panel.innerHTML = html
+
+    return
+
+  }
+
+  if (activeTab === 'deep') {
+
+    // 심층 탭은 종합 해석 카드 없이 계산 근거만 보여 준다
+
+    panel.innerHTML = deepPanelHtml(report.chart, detailLevel)
 
   }
 
